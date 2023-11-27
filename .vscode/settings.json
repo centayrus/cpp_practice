@@ -56,6 +56,5 @@
         "streambuf": "cpp",
         "typeinfo": "cpp",
         "variant": "cpp"
-        "limits": "cpp"
     }
 }
