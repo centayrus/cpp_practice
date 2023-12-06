@@ -196,10 +196,13 @@ void TestCommon() {
     Query q;
     output << bus_man.GetAllBuses();
     assert(output.str() == "No buses"s);
+    output.str("");
     output << bus_man.GetBusesForStop("Marushkino"s);
     assert(output.str() == "No stop"s);
+    output.str("");
     output << bus_man.GetStopsForBus("32K"s);
     assert(output.str() == "No bus"s);
+    output.str("");
     input.str("NEW_BUS 32 3 Tolstopaltsevo Marushkino Vnukovo"s);
     input >> q;
     bus_man.AddBus(q.bus, q.stops);
@@ -217,7 +220,7 @@ void TestBusManager() {
 int main() {
     TestBusManager();
     int query_count;
-    Query q;
+    Query q; 
 
     cin >> query_count;
 
