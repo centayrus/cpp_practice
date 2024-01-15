@@ -11,7 +11,8 @@
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}",
                 "-Wall",
-                "-Werror"
+                "-Werror",
+                "-pg"
             ],
             "options": {
                 "cwd": "${fileDirname}"

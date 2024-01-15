@@ -55,7 +55,10 @@
     "iomanip": "cpp",
     "limits": "cpp",
     "numbers": "cpp",
-    "variant": "cpp"
+    "variant": "cpp",
+    "semaphore": "cpp",
+    "stop_token": "cpp",
+    "thread": "cpp"
   },
   "C_Cpp.default.compilerPath": "/usr/bin/g++",
   "C_Cpp.intelliSenseEngineFallback": "enabled",
