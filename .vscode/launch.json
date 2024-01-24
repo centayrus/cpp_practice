@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": false,
-      "cwd": "/home/atamiev/GitHub/cpp_practice/sprint_5/L1_9ComputeAvgTemp",
-      "program": "/home/atamiev/GitHub/cpp_practice/sprint_5/L1_9ComputeAvgTemp/build/Release/outRelease",
+      "cwd": "/usr/include/c++/13/bits",
+      "program": "/usr/include/c++/13/bits/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

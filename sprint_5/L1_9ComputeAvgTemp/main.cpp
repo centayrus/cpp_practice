@@ -9,8 +9,8 @@
 using namespace std;
 
 struct AvgTemp {
-    float temp;
-    long unsigned int count;
+    float temp = 0.f;
+    long unsigned int count = 0;
 };
 
 vector<float> ComputeAvgTemp(const vector<vector<float>> &measures) {
@@ -19,40 +19,30 @@ vector<float> ComputeAvgTemp(const vector<vector<float>> &measures) {
         return result;
     }
     long unsigned int m = measures.size();
-    result.reserve(m);
-    vector<AvgTemp> at;
-    
-at.reserve(measures[0].size());
-    for (long unsigned int j = 0; j < m; ++j) {
-        long unsigned int n = measures[j].size();
-        at[j].temp = 0.f;
-        at[j].count = 1;
-        for (long unsigned int i = 0; i < n; ++i) {
-          at[i].temp += (measures[j][i] > 0.f ? measures[j][i] : 0.f);
-        at[i].count += (measures[j][i] > 0.f ? 1 : 0);
-        
-            }
-       // result.push_back(at[i].temp/at[i].count);   
-      
-        }
+    long unsigned int n = measures[0].size();
+    vector<AvgTemp> temp_temp;
+    temp_temp.reserve(n);
+    result.reserve(n);
 
-cout << result.size() << endl;
-for (auto i : at) {
-    
-    result.push_back(i.temp / i.count);
-    //cout << "result: " << *i << endl;
-}
-          return result;
+    for (long unsigned int j = 0; j < m; ++j) {
+        for (long unsigned int i = 0; i < n; ++i) {
+            temp_temp[i].temp += (measures[j][i] > 0.f ? measures[j][i] : 0.f);
+            temp_temp[i].count += (measures[j][i] > 0.f ? 1 : 0);
+        }
+    }
+    for (size_t i = 0; i < n; ++i) {
+        result.push_back(temp_temp[i].temp / (temp_temp[i].count == 0 ? 1 : temp_temp[i].count));
+    }
+    return result;
 }
 
 vector<float> GetRandomVector(int size) {
-   // static mt19937 engine;
-   // uniform_real_distribution<float> d(-100, 100);
+    static mt19937 engine;
+    uniform_real_distribution<float> d(-100, 100);
 
     vector<float> res(size);
     for (int i = 0; i < size; ++i) {
-       // res[i] = d(engine);
-       res[i] = 1.f;
+        res[i] = d(engine);
     }
 
     return res;
