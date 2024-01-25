@@ -14,6 +14,38 @@ using filesystem::path;
 path operator""_p(const char *data, std::size_t sz) {
     return path(data, data + sz);
 }
+path LocalDirSearch(const path &parent, const path &inc_path) {
+    path p3;
+    for (const auto &dir_entry : filesystem::directory_iterator(parent / inc_path.parent_path())) {
+        path p = inc_path.filename().string();
+       // path p2 = parent / inc_path;
+        if (dir_entry.path().filename().string() == p && dir_entry.status().type() == filesystem::file_type::regular) {
+            ifstream in_check(dir_entry.path());
+            p3 = dir_entry.path();
+            return p3;
+           // Preprocess(parent / inc_path, out_file, in_file, include_directories);
+            //return true;
+        }
+    }
+    return p3;
+}
+
+path VectorDirSearch(const path &inc_path, const vector<path> &include_directories, const path in_file) {
+    path p3;
+    for (const auto &v_path : include_directories) {
+        for (const auto &dir_entry : filesystem::directory_iterator(v_path / inc_path.parent_path())) {
+            if (dir_entry.path().filename().string() == inc_path.filename().string() && dir_entry.status().type() == filesystem::file_type::regular) {
+              ifstream in_check(dir_entry.path());
+            p3 = dir_entry.path();
+            return p3;
+           // Preprocess(parent / inc_path, out_file, in_file, include_directories);
+            //return true;
+        }
+        }
+    }
+    cout << "unknown include file "s << inc_path.filename().string() << " at file "s << in_file << " at line "s << __LINE__ + 1 << endl;
+    return p3;
+}
 
 bool Preprocess(const path &in_file, const path &out_file, const path &cur_file, const vector<path> &include_directories) {
     smatch m;
@@ -30,22 +62,22 @@ bool Preprocess(const path &in_file, const path &out_file, const path &cur_file,
         path inc_path;
         if (regex_match(str, m, includ_file)) {
             inc_path = string(m[1]);
-            for (const auto &dir_entry : filesystem::directory_iterator(parent / inc_path)) {
-                path p = inc_path.filename().string();
-                path p2 = parent / inc_path;
-                cout << p2 << endl;
-                if (dir_entry.path().filename().string() == p && dir_entry.status().type() == filesystem::file_type::regular) {
-                   // ifstream in(dir_entry.path())
-                   //     Preprocess(parent / inc_path, out_file, inc_path.filename().string(), include_directories);
-                    continue;;
+            path p = LocalDirSearch(parent, inc_path);
+
+            if (!p.empty()) {
+                Preprocess(p, out_file, in_file, include_directories);
+            } else {
+                path p2 = VectorDirSearch(inc_path, include_directories, in_file);
+                if (!p2.empty()) {
+                    Preprocess(p2, out_file, in_file, include_directories);
                 }
             }
-
         } else if (regex_match(str, m, includ_lib)) {
             inc_path = string(m[1]);
         }
-        cout << "unknown include file "s << in_file.filename().string() << " at file "s << cur_file.string() << " at line "s << __LINE__ - 1 << endl;
-
+        if (!inc_path.empty()) {
+            VectorDirSearch(inc_path, include_directories, in_file);
+        }
         out << str << endl;
     }
     return true;
