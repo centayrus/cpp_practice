@@ -53,6 +53,7 @@ bool Preprocess(const path &in_file, const path &out_file, const path &cur_file,
     path parent = in_file.parent_path();
     static const regex includ_file(R"/(\s*#\s*include\s*"([^"]*)"\s*)/");
     static const regex includ_lib(R"/(\s*#\s*include\s*<([^>]*)>\s*)/");
+    static const regex includ_other(R"/(\s*#\s*include[\w\W]*)/");
     ifstream in(in_file);
     while (!in) {
         continue;
@@ -74,6 +75,8 @@ bool Preprocess(const path &in_file, const path &out_file, const path &cur_file,
             }
         } else if (regex_match(str, m, includ_lib)) {
             inc_path = string(m[1]);
+        } else if (regex_match(str, m, includ_file)) {
+            return false;
         }
         if (!inc_path.empty()) {
             VectorDirSearch(inc_path, include_directories, in_file);
