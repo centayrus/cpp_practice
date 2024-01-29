@@ -1,10 +1,10 @@
 #include <iostream>
-
+#include <string>
 
 using namespace std;
 
-
-int main() {
+template <typename F>
+string BruteForce(F check) {
     string result("A", 5);
     for (auto chr = 'A'; chr <= 'Z'; ++chr) {
         result[0] = chr;
@@ -16,15 +16,21 @@ int main() {
                     result[3] = chr;
                     for (auto chr = 'A'; chr <= 'Z'; ++chr) {
                         result[4] = chr;
-                        cout << result << endl;
-                        
+                        if (check(result)) {
+                            return result;
+                        }
                     }
                 }
             }
         }
     }
+    return "Пароль не найден"s;
+}
 
-
-
-    return 0;
+int main() {
+    string pass = "ARTUR"s;
+    auto check = [pass](const string &s) {
+        return s == pass;
+    };
+    cout << BruteForce(check) << endl;
 }
