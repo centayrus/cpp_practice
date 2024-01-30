@@ -1,14 +1,30 @@
-#include <filesystem>
 #include <iostream>
+
 
 using namespace std;
 
+
 int main() {
-    using filesystem::path;
+    string result("A", 5);
+    for (auto chr = 'A'; chr <= 'Z'; ++chr) {
+        result[0] = chr;
+        for (auto chr = 'A'; chr <= 'Z'; ++chr) {
+            result[1] = chr;
+            for (auto chr = 'A'; chr <= 'Z'; ++chr) {
+                result[2] = chr;
+                for (auto chr = 'A'; chr <= 'Z'; ++chr) {
+                    result[3] = chr;
+                    for (auto chr = 'A'; chr <= 'Z'; ++chr) {
+                        result[4] = chr;
+                        cout << result << endl;
+                        
+                    }
+                }
+            }
+        }
+    }
 
-    path p = path("a") / path("folder") / path("and") / path("..") / path("a") / path("file.txt");
 
-    // выводим естественное представление пути в std::string
-    cout << p.string() << endl;
-    cout << __LINE__ << endl;
+
+    return 0;
 }

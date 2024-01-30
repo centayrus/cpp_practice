@@ -12,5 +12,5 @@ unsigned int Fibonacci(unsigned int iter) {
 }
 
 int main() {
-    cout << Fibonacci(15) << endl;
+    cout << Fibonacci(45) << endl;
 }
