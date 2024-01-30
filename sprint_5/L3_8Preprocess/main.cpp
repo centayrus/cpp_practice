@@ -41,7 +41,7 @@ path VectorDirSearch(const path &inc_path, const vector<path> &include_directori
               ifstream in_check(dir_entry.path());
               if (in_check) {
                 return find_path;
-              }
+              } 
         }
         }
     }
@@ -56,9 +56,9 @@ bool Preprocess(const path &in_file, const path &out_file, const path &cur_file,
     static const regex includ_file(R"/(\s*#\s*include\s*"([^"]*)"\s*)/");
     static const regex includ_lib(R"/(\s*#\s*include\s*<([^>]*)>\s*)/");
     ifstream in(in_file);
-  //  while (!in) {
-  //      continue;
-   // }
+   while (!in) {
+       continue;
+   }
     ofstream out(out_file, ios::app);
     while (getline(in, str)) {
         path inc_path;
@@ -75,7 +75,7 @@ bool Preprocess(const path &in_file, const path &out_file, const path &cur_file,
                     continue;
                 }
             }
-        cout << "unknown include file "s << inc_path.filename().string() << " at file "s << cur_file.string() << " at line "s << __LINE__ << endl;
+        cout << "unknown include file "s << inc_path.filename().string() << " at file "s << cur_file.string() << " at line "s << 8 << endl;
         return false;
 
         } else if (regex_match(str, m, includ_lib)) {
@@ -86,7 +86,7 @@ bool Preprocess(const path &in_file, const path &out_file, const path &cur_file,
                 Preprocess(vector_path, out_file, in_file, include_directories);
                     continue;
             }
-        cout << "unknown include file "s << inc_path.filename().string() << " at file "s << cur_file.string() << " at line "s << __LINE__ << endl; 
+        cout << "unknown include file "s << inc_path.filename().string() << " at file "s << cur_file.string() << " at line "s << 8 << endl; 
         return false;  
         }
         
