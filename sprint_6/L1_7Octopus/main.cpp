@@ -1,3 +1,4 @@
+#include <cassert>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -8,7 +9,8 @@ using namespace std;
 class Tentacle {
 public:
     explicit Tentacle(int id)
-        : id_(id) {
+        : id_(id)
+    {
     }
 
     int GetId() const {
@@ -74,12 +76,12 @@ private:
     vector<Tentacle*> tentacles_;
 };
 
+// Напишите функцию main, в ней создайте осьминога и несколько его копий
+
 int main() {
-    {
-        Octopus octopus;
-        // Мы просто хотели ещё одного осьминога
-        Octopus octopus1 = octopus;
-        cout << "Tentacle id="s << octopus1.GetTentacle(3).GetId() << endl;
-    }
-    cout << "OK"s << endl;
+    Octopus oct;
+    Octopus oct1 = oct;
+    Octopus oct2 = oct1;
+//for (int i = 0; i < oct.GetTentacle(7); ++i)
+    cout << oct.GetTentacle(0).GetId() << endl;
 }
