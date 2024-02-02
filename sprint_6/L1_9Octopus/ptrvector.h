@@ -5,7 +5,7 @@
 template <typename T>
 class PtrVector {
 public:
-    PtrVector() = default;
+    PtrVector() = default; 
 
     // Создаёт вектор указателей на копии объектов из other
     PtrVector(const PtrVector& other) {

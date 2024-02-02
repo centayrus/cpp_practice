@@ -9,7 +9,7 @@ int main() {
     // Проверка конструирования осьминогов
     {
         // По умолчанию осьминог имеет 8 щупалец
-        Octopus default_octopus;
+        Octopus default_octopus; 
         assert(default_octopus.GetTentacleCount() == 8);
 
         // Осьминог может иметь отличное от 8 количество щупалец

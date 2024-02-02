@@ -4,7 +4,7 @@
 
 template <typename T>
 class ScopedPtr {
-public:
+public: 
     ScopedPtr() = default;
 
     explicit ScopedPtr(T* raw_ptr) noexcept

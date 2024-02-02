@@ -8,7 +8,7 @@
 
 // Щупальце
 class Tentacle {
-public:
+public: 
     explicit Tentacle(int id) noexcept
         : id_(id) {
     }
@@ -18,18 +18,18 @@ public:
     }
 
     Tentacle *GetLinkedTentacle() const noexcept {
-        return linked_tentacle_;
+        return linked_tentacle_.GetRawPtr();
     }
     void LinkTo(Tentacle &tentacle) noexcept {
         linked_tentacle_ = &tentacle;
     }
     void Unlink() noexcept {
-        linked_tentacle_ = nullptr;
+        linked_tentacle_.Release() = nullptr;
     }
 
 private:
     int id_ = 0;
-    Tentacle *linked_tentacle_ = nullptr;
+    ScopedPtr<Tentacle*> linked_tentacle_;
 };
 
 // Осьминог
