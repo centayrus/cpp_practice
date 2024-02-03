@@ -27,10 +27,10 @@ public:
             // Реализация операции присваивания с помощью идиомы Copy-and-swap.
             // Если исключение будет выброшено, то на текущий объект оно не повлияет.
             auto rhs_copy(rhs);
-
+            items_.swap(rhs_copy.GetItems());
             // rhs_copy содержит копию правого аргумента.
             // Обмениваемся с ним данными.
-            items_.swap(rhs_copy);
+            //swap(rhs_copy);
 
             // Теперь текущий объект содержит копию правого аргумента,
             // а rhs_copy - прежнее состояние текущего объекта, которое при выходе
@@ -47,10 +47,7 @@ public:
         for (auto &ptr : items_) {
             delete ptr;
         }
-
-        //        items_.clear();
     }
-   
 
     // Возвращает ссылку на вектор указателей
     vector<T *> &GetItems() noexcept {
@@ -172,3 +169,5 @@ int main() {
         assert(other_item0_copy_count == 0);
     }
 }
+
+
