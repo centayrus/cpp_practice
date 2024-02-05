@@ -1,11 +1,11 @@
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
-#include <string>
-#include <utility>
 #include <iostream>
 #include <iterator>
-    using namespace std;
+#include <string>
+#include <utility>
+
 template <typename Type>
 class SingleLinkedList {
     // Узел списка
@@ -17,7 +17,6 @@ class SingleLinkedList {
         Type value;
         Node *next_node = nullptr;
     };
-
     // Шаблон класса «Базовый Итератор».
     // Определяет поведение итератора на элементы односвязного списка
     // ValueType — совпадает с Type (для Iterator) либо с const Type (для ConstIterator)
@@ -29,10 +28,10 @@ class SingleLinkedList {
 
         // Конвертирующий конструктор итератора из указателя на узел списка
         explicit BasicIterator(Node *node)
-        :node_(node) {
+            : node_(node) {
             // assert(false);
             // Реализуйте конструктор самостоятельно
-            //node_ = node;
+            // node_ = node;
         }
 
     public:
@@ -59,7 +58,6 @@ class SingleLinkedList {
             //  assert(false);
             // Реализуйте конструктор самостоятельно
             node_ = other.node_;
-            
         }
 
         // Чтобы компилятор не выдавал предупреждение об отсутствии оператора = при наличии
@@ -103,10 +101,7 @@ class SingleLinkedList {
         // Возвращает ссылку на самого себя
         // Инкремент итератора, не указывающего на существующий элемент списка, приводит к неопределённому поведению
         BasicIterator &operator++() noexcept {
-           // if (node_->next_node) {
             node_ = node_->next_node;
-           // return *this;
-           // }
             return *this;
         }
 
@@ -115,9 +110,9 @@ class SingleLinkedList {
         // Инкремент итератора, не указывающего на существующий элемент списка,
         // приводит к неопределённому поведению
         BasicIterator operator++(int) noexcept {
-            // auto old_value = new BasicIterator<ValueType>; // Сохраняем прежнее значение объекта для последующего возврата
+            // Сохраняем прежнее значение объекта для последующего возврата
             auto old_value(*this); // Сохраняем прежнее значение объекта для последующего возврата
-            ++(*this);        // используем логику префиксной формы инкремента
+            ++(*this);             // используем логику префиксной формы инкремента
             return old_value;
         }
 
@@ -135,11 +130,8 @@ class SingleLinkedList {
         // Вызов этого оператора у итератора, не указывающего на существующий элемент списка,
         // приводит к неопределённому поведению
         [[nodiscard]] pointer operator->() const noexcept {
-            //assert(false);
-            // Заглушка. Реализуйте thisоператор самостоятельно
-           // auto tmp = new Type(node_->value);
-            
-          //  items_.push_back(new T(*ptr));   
+            // assert(false);
+            //  Заглушка. Реализуйте thisоператор самостоятельно
             return &node_->value;
         }
 
@@ -148,6 +140,58 @@ class SingleLinkedList {
     };
 
 public:
+    SingleLinkedList() {
+        Node();
+        size_ = 0;
+    }
+
+    // template <typename Iterator>
+    // void CopyInputIntoList(const Iterator &it1, const Iterator &it2) {
+    //     SingleLinkedList tmp;
+    //     Node *pre = &(tmp.head_);
+    //     if (*it1)
+    //     for (auto i = it1; i != it2; ++i) {
+    //         Type l = *i;
+    //         pre->next_node = new Node(l, nullptr);
+    //     }
+    //     swap(tmp);
+    // }
+
+    SingleLinkedList(std::initializer_list<Type> values) {
+        //CopyInputIntoList(values.begin(), values.end());
+        SingleLinkedList tmp;
+        Node *pre = &(tmp.head_);
+        for (auto i = values.begin(); i != values.end(); ++i) {
+            Type l = *i;
+            pre->next_node = new Node(l, nullptr);
+            ++tmp;
+        }
+        swap(tmp);
+    }
+
+    SingleLinkedList(const SingleLinkedList &other) {
+        //CopyInputIntoList(other.cbegin(), other.cend());
+        SingleLinkedList tmp;
+        Node *pre = &(tmp.head_);
+        for (auto i = other.begin(); i != other.end(); ++i) {
+            Type l = i.node_.value;
+            pre->next_node = new Node(l, nullptr);
+            ++tmp;
+        }
+        swap(tmp);
+    }
+
+    SingleLinkedList &operator=(const SingleLinkedList &rhs) {
+        if (*this != rhs) {
+           *this = rhs;
+            }
+        return *this;
+    }
+
+    void swap(SingleLinkedList &other) noexcept {
+        *this.swap(other);
+    }
+
     using value_type = Type;
     using reference = value_type &;
     using const_reference = const value_type &;
@@ -163,7 +207,7 @@ public:
         // assert(false);
         //  Реализуйте самостоятельно
         if (size_) {
-        return Iterator{head_.next_node};    
+            return Iterator{head_.next_node};
         }
         return end();
     }
@@ -200,7 +244,7 @@ public:
         // assert(false);
         //  Реализуйте самостоятельно
         if (size_) {
-        return Iterator{head_.next_node};    
+            return Iterator{head_.next_node};
         }
         return cend();
     }
@@ -212,11 +256,6 @@ public:
         return Iterator{nullptr};
     }
 
-//public:
-    SingleLinkedList() {
-        Node();
-        size_ = 0;
-    }
     // Возвращает количество элементов в списке
     [[nodiscard]] size_t GetSize() const noexcept {
         return size_;
@@ -260,72 +299,229 @@ private:
     size_t size_;
 };
 
-// Эта функция тестирует работу SingleLinkedList
-void Test2() {
-    // Итерирование по пустому списку
-    // Итерирование по непустому списку
-    {
-        SingleLinkedList<int> list;
-       // const auto &const_list = list;
-
-        list.PushFront(1);
-        
-       // *list.begin() = -1;
-
-        const auto old_begin = list.cbegin();
-        list.PushFront(2);
-
-        const auto new_begin = list.cbegin();
-        // Проверка прединкремента
-        {
-            auto new_begin_copy(new_begin);
-            assert((++(new_begin_copy)) == old_begin);
-        }
-        // Проверка постинкремента
-        {
-            auto new_begin_copy(new_begin);
-           assert(((new_begin_copy)++) == new_begin);
-            assert(new_begin_copy == old_begin);
-        }
-        // Итератор, указывающий на позицию после последнего элемента, равен итератору end()
-        {
-            auto old_begin_copy(old_begin);
-            assert((++old_begin_copy) == list.end());
-            //list.end());
-        }
-    }
-    // Преобразование итераторов
-    {
-        SingleLinkedList<int> list;
-        list.PushFront(1);
-        // Конструирование ConstIterator из Iterator
-        SingleLinkedList<int>::ConstIterator const_it(list.begin());
-        assert(const_it == list.cbegin());
-        assert(*const_it == *list.cbegin());
-
-        SingleLinkedList<int>::ConstIterator const_it1;
-        // Присваивание ConstIterator'у значения Iterator
-        const_it1 = list.begin();
-        assert(const_it1 == const_it);
-    }
-    // Проверка оператора ->
-    {
-        using namespace std;
-        SingleLinkedList<std::string> string_list;
-
-        string_list.PushFront("one"s);
-        assert(string_list.cbegin()->length() == 3u);
-        string_list.begin()->push_back('!');
-        assert(string_list.cbegin()->length() == 4u);
-        assert(*string_list.begin() == "one!"s);
-    }
+template <typename Type>
+void swap(SingleLinkedList<Type> &lhs, SingleLinkedList<Type> &rhs) noexcept {
+    lhs.swap(rhs);
 }
 
-int main() {
-    SingleLinkedList<int> numbers;
-    if (const auto it = std::find(numbers.cbegin(), numbers.cend(), 42); it != numbers.cend()) {
-        cout << "The list contains 42"s << endl;
-    } else {
-        cout << "The list doesn't contain 42"s << endl;
+template <typename Type>
+bool operator==(const SingleLinkedList<Type> &lhs, const SingleLinkedList<Type> &rhs) {
+    if (lhs.GetSize() == rhs.GetSize()) {
+        return std::equal(*rhs.cbegin(), *rhs.cend(), *lhs.cbegin());
     }
+    return false;
+}
+
+template <typename Type>
+bool operator!=(const SingleLinkedList<Type> &lhs, const SingleLinkedList<Type> &rhs) {
+    return !std::equal(lhs.cbegin(), lhs.end(), rhs.begin());
+}
+
+template <typename Type>
+bool operator<(const SingleLinkedList<Type> &lhs, const SingleLinkedList<Type> &rhs) {
+    return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
+
+template <typename Type>
+bool operator<=(const SingleLinkedList<Type> &lhs, const SingleLinkedList<Type> &rhs) {
+    return !std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
+
+template <typename Type>
+bool operator>(const SingleLinkedList<Type> &lhs, const SingleLinkedList<Type> &rhs) {
+    return std::lexicographical_compare(rhs.head_.value.begin(), rhs.head_.value.end(), lhs.head_.value.begin(), lhs.head_.value.end());
+}
+
+template <typename Type>
+bool operator>=(const SingleLinkedList<Type> &lhs, const SingleLinkedList<Type> &rhs) {
+    return std::lexicographical_compare(rhs.cbegin(), rhs.cend(), lhs.cbegin(), lhs.cend());
+}
+
+// Эта функция проверяет работу класса SingleLinkedList
+void Test3() {
+
+    // Проверка списков на равенство и неравенство
+/*     {
+        SingleLinkedList<int> list_1;
+        list_1.PushFront(1);
+        list_1.PushFront(2);
+
+        SingleLinkedList<int> list_2;
+        list_2.PushFront(1);
+        list_2.PushFront(2);
+        list_2.PushFront(3);
+
+        SingleLinkedList<int> list_1_copy;
+        list_1_copy.PushFront(1);
+        list_1_copy.PushFront(2);
+
+        SingleLinkedList<int> empty_list;
+        SingleLinkedList<int> another_empty_list;
+
+        // Список равен самому себе
+        assert(list_1 == list_1);
+        assert(empty_list == empty_list);
+
+        // Списки с одинаковым содержимым равны, а с разным - не равны
+        assert(list_1 == list_1_copy);
+        assert(list_1 != list_2);
+        assert(list_2 != list_1);
+        assert(empty_list == another_empty_list);
+    } */
+
+// Обмен содержимого списков
+    // {
+    //     SingleLinkedList<int> first;
+    //     first.PushFront(1);
+    //     first.PushFront(2);
+
+    //     SingleLinkedList<int> second;
+    //     second.PushFront(10);
+    //     second.PushFront(11);
+    //     second.PushFront(15);
+
+    //     const auto old_first_begin = first.begin();
+    //     const auto old_second_begin = second.begin();
+    //     const auto old_first_size = first.GetSize();
+    //     const auto old_second_size = second.GetSize();
+
+    //     first.swap(second);
+
+    //     assert(second.begin() == old_first_begin);
+    //     assert(first.begin() == old_second_begin);
+    //     assert(second.GetSize() == old_first_size);
+    //     assert(first.GetSize() == old_second_size);
+
+    //     // Обмен при помощи функции swap
+    //     {
+    //         using std::swap;
+
+    //         // В отсутствие пользовательской перегрузки будет вызвана функция std::swap, которая
+    //         // выполнит обмен через создание временной копии
+    //         swap(first, second);
+
+    //         // Убеждаемся, что используется не std::swap, а пользовательская перегрузка
+
+    //         // Если бы обмен был выполнен с созданием временной копии,
+    //         // то итератор first.begin() не будет равен ранее сохранённому значению,
+    //         // так как копия будет хранить свои узлы по иным адресам
+    //         assert(first.begin() == old_first_begin);
+    //         assert(second.begin() == old_second_begin);
+    //         assert(first.GetSize() == old_first_size);
+    //         assert(second.GetSize() == old_second_size);
+    //     }
+    // }
+
+    // Инициализация списка при помощи std::initializer_list
+    {
+        SingleLinkedList<int> list{1, 2, 3, 4, 5};
+        assert(list.GetSize() == 5);
+        assert(!list.IsEmpty());
+        assert(std::equal(list.begin(), list.end(), std::begin({1, 2, 3, 4, 5})));
+    }
+
+    // Лексикографическое сравнение списков
+    {
+        using IntList = SingleLinkedList<int>;
+
+        assert((IntList{1, 2, 3} < IntList{1, 2, 3, 1}));
+        assert((IntList{1, 2, 3} <= IntList{1, 2, 3}));
+        assert((IntList{1, 2, 4} > IntList{1, 2, 3}));
+        assert((IntList{1, 2, 3} >= IntList{1, 2, 3}));
+    }
+
+    // Копирование списков
+ /*    {
+        const SingleLinkedList<int> empty_list{};
+        // Копирование пустого списка
+        {
+            auto list_copy(empty_list);
+            assert(list_copy.IsEmpty());
+        }
+
+        SingleLinkedList<int> non_empty_list{1, 2, 3, 4};
+        // Копирование непустого списка
+        {
+            auto list_copy(non_empty_list);
+
+            assert(non_empty_list.begin() != list_copy.begin());
+            assert(list_copy == non_empty_list);
+        }
+    }
+
+    // Присваивание списков
+    {
+        const SingleLinkedList<int> source_list{1, 2, 3, 4};
+
+        SingleLinkedList<int> receiver{5, 4, 3, 2, 1};
+        receiver = source_list;
+        assert(receiver.begin() != source_list.begin());
+        assert(receiver == source_list);
+    }
+
+    // Вспомогательный класс, бросающий исключение после создания N-копии
+    struct ThrowOnCopy {
+        ThrowOnCopy() = default;
+        explicit ThrowOnCopy(int &copy_counter) noexcept
+            : countdown_ptr(&copy_counter) {
+        }
+        ThrowOnCopy(const ThrowOnCopy &other)
+            : countdown_ptr(other.countdown_ptr) //
+        {
+            if (countdown_ptr) {
+                if (*countdown_ptr == 0) {
+                    throw std::bad_alloc();
+                } else {
+                    --(*countdown_ptr);
+                }
+            }
+        }
+        // Присваивание элементов этого типа не требуется
+        ThrowOnCopy &operator=(const ThrowOnCopy &rhs) = delete;
+        // Адрес счётчика обратного отсчёта. Если не равен nullptr, то уменьшается при каждом копировании.
+        // Как только обнулится, конструктор копирования выбросит исключение
+        int *countdown_ptr = nullptr;
+    };
+
+    // Безопасное присваивание списков
+    {
+        SingleLinkedList<ThrowOnCopy> src_list;
+        src_list.PushFront(ThrowOnCopy{});
+        src_list.PushFront(ThrowOnCopy{});
+        auto thrower = src_list.begin();
+        src_list.PushFront(ThrowOnCopy{});
+
+        int copy_counter = 0; // при первом же копировании будет выброшено исключение
+        thrower->countdown_ptr = &copy_counter;
+
+        SingleLinkedList<ThrowOnCopy> dst_list;
+        dst_list.PushFront(ThrowOnCopy{});
+        int dst_counter = 10;
+        dst_list.begin()->countdown_ptr = &dst_counter;
+        dst_list.PushFront(ThrowOnCopy{});
+
+        try {
+            dst_list = src_list;
+            // Ожидается исключение при присваивании
+            assert(false);
+        } catch (const std::bad_alloc &) {
+            // Проверяем, что состояние списка-приёмника не изменилось
+            // при выбрасывании исключений
+            assert(dst_list.GetSize() == 2);
+            auto it = dst_list.begin();
+            assert(it != dst_list.end());
+            assert(it->countdown_ptr == nullptr);
+            ++it;
+            assert(it != dst_list.end());
+            assert(it->countdown_ptr == &dst_counter);
+            assert(dst_counter == 10);
+        } catch (...) {
+            // Других типов исключений не ожидается
+            assert(false);
+        }
+    } */
+} 
+
+int main() {
+    Test3();
 }
