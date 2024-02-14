@@ -34,7 +34,9 @@
                 "-g",
                 "${file}",
                 "-o",
-                "${fileDirname}/${fileBasenameNoExtension}"
+                "${fileDirname}/${fileBasenameNoExtension}",
+                "-Wall",
+                "-Werror"
             ],
             "options": {
                 "cwd": "${fileDirname}"
