@@ -10,7 +10,6 @@ public:
         if (a_size > N) {
             throw std::invalid_argument("Size exceed Capacity"s);
         }
-     //   vector_stack_.fill(a_size);
     };
 
     T &operator[](size_t index) {

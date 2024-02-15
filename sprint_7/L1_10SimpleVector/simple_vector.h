@@ -3,6 +3,7 @@
 #include <cassert>
 #include <initializer_list>
 #include <stdexcept>
+#include <iostream>
 
 #include "array_ptr.h"
 
@@ -15,29 +16,36 @@ public:
     SimpleVector() noexcept = default;
 
     // Создаёт вектор из size элементов, инициализированных значением по умолчанию
-    explicit SimpleVector(size_t size) {
+    explicit SimpleVector(size_t size) : items_(size) {
         size_ = size;
         capacity_ = size;
+        
         if (size > 0) {
             std::fill(items_.Get(), items_.Get() + size_, 0);
         }
     }
 
     // Создаёт вектор из size элементов, инициализированных значением value
-    SimpleVector(size_t size, const Type &value) {
+    SimpleVector(size_t size, const Type &value) : items_(size) {
         size_ = size;
         capacity_ = size;
+       // ArrayPtr<Type> items_(size); 
         if (size > 0) {
             std::fill(items_.Get(), items_.Get() + size_, value);
         }
     }
 
     // Создаёт вектор из std::initializer_list
-    SimpleVector(std::initializer_list<Type> init) {
+     SimpleVector(std::initializer_list<Type> init) :items_(init.size()) {
         size_ = init.size();
         capacity_ = init.size();
-        if (init.size()) {
-            std::copy(items_.begin(), items_.end(), init.begin());
+        
+        if (init.size() > 0) {
+            size_t i = 0;
+            for (const Type e : init) {
+                items_[i] = e;
+                ++i;
+            }
         }
     }
 
@@ -101,51 +109,50 @@ public:
             std::fill(items_.Get() + size_, items_.Get() + new_size, 0);
             size_ = new_size;
         } else if (new_size > capacity_) {
-            SimpleVector<Type> v(new_size);
-            //std::copy(v.begin(), v.end(), this->begin());
-            std::copy(v.items_.Get(), v.items_.Get()+size_, items_.Get());
-            std::fill(v.items_.Get()+size_, v.items_.Get()+new_size, 0);
-            this->items_.swap(v.items_);
+            SimpleVector<Type> u(new_size);
+            std::copy(items_.Get(), items_.Get()+size_, u.items_.Get());
+            std::fill(u.items_.Get()+size_, u.items_.Get()+new_size, 0);
+            this->items_.swap(u.items_);
             size_ = new_size;
             capacity_ = new_size;
         }
     }
 
-    // Возвращает итератор на начало массива
-    // Для пустого массива может быть равен (или не равен) nullptr
-    Iterator begin() noexcept {
-        return items_.Get();
-    }
+    // // Возвращает итератор на начало массива
+    // // Для пустого массива может быть равен (или не равен) nullptr
+    // Iterator begin() noexcept {
+    //     return items_.Get();
+    // }
 
-    // Возвращает итератор на элемент, следующий за последним
-    // Для пустого массива может быть равен (или не равен) nullptr
-    Iterator end() noexcept {
-        return items_.Get() + size_;
-    }
+    // // Возвращает итератор на элемент, следующий за последним
+    // // Для пустого массива может быть равен (или не равен) nullptr
+    // Iterator end() noexcept {
+    //     return items_.Get() + size_;
+    // }
 
-    // Возвращает константный итератор на начало массива
-    // Для пустого массива может быть равен (или не равен) nullptr
-    ConstIterator begin() const noexcept {
-        return items_.Get();
-    }
+    // // Возвращает константный итератор на начало массива
+    // // Для пустого массива может быть равен (или не равен) nullptr
+    // ConstIterator begin() const noexcept {
+    //     return items_.Get();
+    // }
 
-    // Возвращает итератор на элемент, следующий за последним
-    // Для пустого массива может быть равен (или не равен) nullptr
-    ConstIterator end() const noexcept {
-        return items_.Get() + size_;
-    }
+    // // Возвращает итератор на элемент, следующий за последним
+    // // Для пустого массива может быть равен (или не равен) nullptr
+    // ConstIterator end() const noexcept {
+    //     return items_.Get() + size_;
+    // }
 
-    // Возвращает константный итератор на начало массива
-    // Для пустого массива может быть равен (или не равен) nullptr
-    ConstIterator cbegin() const noexcept {
-        return items_.Get();
-    }
+    // // Возвращает константный итератор на начало массива
+    // // Для пустого массива может быть равен (или не равен) nullptr
+    // ConstIterator cbegin() const noexcept {
+    //     return items_.Get();
+    // }
 
-    // Возвращает итератор на элемент, следующий за последним
-    // Для пустого массива может быть равен (или не равен) nullptr
-    ConstIterator cend() const noexcept {
-        return items_.Get() + size_;
-    }
+    // // Возвращает итератор на элемент, следующий за последним
+    // // Для пустого массива может быть равен (или не равен) nullptr
+    // ConstIterator cend() const noexcept {
+    //     return items_.Get() + size_;
+    // }
 
 private:
     ArrayPtr<Type> items_;
