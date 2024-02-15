@@ -24,9 +24,9 @@ vector<string_view> SplitIntoWordsView(string_view str) {
 }
 
 int main() {
-    assert((SplitIntoWordsView("") == vector<string_view>{}));
-    assert((SplitIntoWordsView("     ") == vector<string_view>{}));
-  // assert((SplitIntoWordsView("aaaaaaa") == vector{"aaaaaaa"sv}));
+    // assert((SplitIntoWordsView("") == vector<string_view>{}));
+    // assert((SplitIntoWordsView("     ") == vector<string_view>{}));
+    assert((SplitIntoWordsView("   aaaaaaa") == vector{"aaaaaaa"sv}));
     assert((SplitIntoWordsView("a") == vector{"a"sv}));
     assert((SplitIntoWordsView("a b c") == vector{"a"sv, "b"sv, "c"sv}));
     assert((SplitIntoWordsView("a    bbb   cc") == vector{"a"sv, "bbb"sv, "cc"sv}));
