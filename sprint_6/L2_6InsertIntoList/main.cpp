@@ -88,6 +88,7 @@ class SingleLinkedList {
         // Возвращает ссылку на самого себя
         // Инкремент итератора, не указывающего на существующий элемент списка, приводит к неопределённому поведению
         BasicIterator &operator++() noexcept {
+            assert(node_ != nullptr);
             node_ = node_->next_node;
             return *this;
         }
@@ -107,6 +108,7 @@ class SingleLinkedList {
         // Вызов этого оператора у итератора, не указывающего на существующий элемент списка,
         // приводит к неопределённому поведению
         [[nodiscard]] reference operator*() const noexcept {
+            assert(node_ != nullptr);
             return node_->value;
         }
 
@@ -114,6 +116,7 @@ class SingleLinkedList {
         // Вызов этого оператора у итератора, не указывающего на существующий элемент списка,
         // приводит к неопределённому поведению
         [[nodiscard]] pointer operator->() const noexcept {
+            assert(node_ != nullptr);
             return &node_->value;
         }
 
@@ -125,18 +128,6 @@ public:
     SingleLinkedList() {
         Node();
         size_ = 0;
-    }
-
-    template <typename Iterator>
-    void CopyInputIntoList(const Iterator &it1, const Iterator &it2) {
-        SingleLinkedList tmp;
-        auto pointer_to_next_node = &tmp.head_.next_node;
-        for (auto i = it1; i != it2; ++i) {
-            *pointer_to_next_node = new Node(*i, nullptr);
-            pointer_to_next_node = &((*pointer_to_next_node)->next_node);
-            ++tmp.size_;
-        }
-        swap(tmp);
     }
 
     SingleLinkedList(std::initializer_list<Type> values) {
@@ -171,10 +162,7 @@ public:
     // Возвращает итератор, ссылающийся на первый элемент
     // Если список пустой, возвращённый итератор будет равен end()
     [[nodiscard]] Iterator begin() noexcept {
-        if (size_) {
             return Iterator{this->head_.next_node};
-        }
-        return end();
     }
 
     // Возвращает итератор, указывающий на позицию, следующую за последним элементом односвязного списка
@@ -187,10 +175,7 @@ public:
     // Если список пустой, возвращённый итератор будет равен end()
     // Результат вызова эквивалентен вызову метода cbegin()
     [[nodiscard]] ConstIterator begin() const noexcept {
-        if (head_.next_node) {
             return cbegin();
-        }
-        return end();
     }
 
     // Возвращает константный итератор, указывающий на позицию, следующую за последним элементом односвязного списка
@@ -203,10 +188,7 @@ public:
     // Возвращает константный итератор, ссылающийся на первый элемент
     // Если список пустой, возвращённый итератор будет равен cend()
     [[nodiscard]] ConstIterator cbegin() const noexcept {
-        if (size_) {
             return ConstIterator{head_.next_node};
-        }
-        return cend();
     }
 
     // Возвращает константный итератор, указывающий на позицию, следующую за последним элементом односвязного списка
@@ -218,16 +200,13 @@ public:
     // Возвращает количество элементов в списке
     [[nodiscard]] size_t GetSize() const noexcept {
         return size_;
-        assert(false);
-        return 42;
+        // assert(false);
+        // return 42;
     }
 
     // Сообщает, пустой ли список
     [[nodiscard]] bool IsEmpty() const noexcept {
-        if (head_.next_node == nullptr) {
-            return true;
-        }
-        return false;
+       return size_ == 0;
     }
 
     // Вставляет элемент value в начало списка за время O(1)
@@ -270,6 +249,7 @@ public:
     }
 
     void PopFront() noexcept {
+        assert(!IsEmpty());
         Node *del_node = head_.next_node;
         head_.next_node = del_node->next_node;
         --size_;
@@ -281,12 +261,11 @@ public:
      * Возвращает итератор на элемент, следующий за удалённым
      */
     Iterator EraseAfter(ConstIterator pos) noexcept {
-        if (size_) {
+        assert(size_);
             Node *deletion_node = pos.node_->next_node;
             pos.node_->next_node = deletion_node->next_node;
             delete deletion_node;
             --size_;
-        }
         return Iterator{pos.node_->next_node};
     }
 
@@ -308,6 +287,18 @@ private:
     // Фиктивный узел, используется для вставки "перед первым элементом"
     Node head_;
     size_t size_;
+
+        template <typename Iterator>
+    void CopyInputIntoList(const Iterator &it1, const Iterator &it2) {
+        SingleLinkedList tmp;
+        auto pointer_to_next_node = &tmp.head_.next_node;
+        for (auto i = it1; i != it2; ++i) {
+            *pointer_to_next_node = new Node(*i, nullptr);
+            pointer_to_next_node = &((*pointer_to_next_node)->next_node);
+            ++tmp.size_;
+        }
+        swap(tmp);
+    }
 };
 
 template <typename Type>
@@ -325,7 +316,7 @@ bool operator==(const SingleLinkedList<Type> &lhs, const SingleLinkedList<Type> 
 
 template <typename Type>
 bool operator!=(const SingleLinkedList<Type> &lhs, const SingleLinkedList<Type> &rhs) {
-    return !std::equal(lhs.cbegin(), lhs.end(), rhs.begin());
+    return !(lhs == rhs);
 }
 
 template <typename Type>
@@ -333,19 +324,21 @@ bool operator<(const SingleLinkedList<Type> &lhs, const SingleLinkedList<Type> &
     return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
 }
 
+// использовал оператор < в каждом операторе
 template <typename Type>
 bool operator<=(const SingleLinkedList<Type> &lhs, const SingleLinkedList<Type> &rhs) {
-    return !std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+    return lhs < rhs;
 }
 
 template <typename Type>
 bool operator>(const SingleLinkedList<Type> &lhs, const SingleLinkedList<Type> &rhs) {
-    return std::lexicographical_compare(rhs.begin(), rhs.end(), lhs.begin(), lhs.end());
+    return !(lhs < rhs);
+    //std::lexicographical_compare(rhs.begin(), rhs.end(), lhs.begin(), lhs.end());
 }
 
 template <typename Type>
 bool operator>=(const SingleLinkedList<Type> &lhs, const SingleLinkedList<Type> &rhs) {
-    return !std::lexicographical_compare(rhs.cbegin(), rhs.cend(), lhs.cbegin(), lhs.cend());
+    return !(lhs < rhs);
 }
 
 void Test4() {
