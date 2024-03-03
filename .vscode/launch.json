@@ -33,9 +33,9 @@
       "request": "launch",
       "args": [],
       "stopAtEntry": false,
-      "externalConsole": true,
-      "cwd": "c:/Users/artem.tamiyev/CPP/cpp_practice/sprint_7/L1_10SimpleVector",
-      "program": "c:/Users/artem.tamiyev/CPP/cpp_practice/sprint_7/L1_10SimpleVector/build/Debug/outDebug",
+      "externalConsole": false,
+      "cwd": "/home/atamiev/GitHub/cpp_practice/sprint_7/L1_11SimpleVector2",
+      "program": "/home/atamiev/GitHub/cpp_practice/sprint_7/L1_11SimpleVector2/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

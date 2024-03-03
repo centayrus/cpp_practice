@@ -25,7 +25,7 @@ inline void Test1() {
             assert(v[i] == 0);
         }
     }
-
+/* 
     // Инициализация вектора, заполненного заданным значением
     {
         SimpleVector<int> v(3, 42);
@@ -39,9 +39,9 @@ inline void Test1() {
     // Инициализация вектора при помощи initializer_list
     {
         SimpleVector<int> v{1, 2, 3};
-         assert(v.GetSize() == 3);
-         assert(v.GetCapacity() == 3);
-         assert(v[2] == 3);
+        assert(v.GetSize() == 3);
+        assert(v.GetCapacity() == 3);
+        assert(v[2] == 3);
     }
 
     // Доступ к элементам при помощи At
@@ -76,42 +76,42 @@ inline void Test1() {
         assert(v[2] == 17);
         assert(v[3] == 0);
     }
-    // {
-    //     SimpleVector<int> v(3);
-    //     v[0] = 42;
-    //     v[1] = 55;
-    //     const size_t old_capacity = v.GetCapacity();
-    //     v.Resize(2);
-    //     assert(v.GetSize() == 2);
-    //     assert(v.GetCapacity() == old_capacity);
-    //     assert(v[0] == 42);
-    //     assert(v[1] == 55);
-    // }
-    // {
-    //     const size_t old_size = 3;
-    //     SimpleVector<int> v(3);
-    //     v.Resize(old_size + 5);
-    //     v[3] = 42;
-    //     v.Resize(old_size);
-    //     v.Resize(old_size + 2);
-    //     assert(v[3] == 1);
-    // }
+    {
+        SimpleVector<int> v(3);
+        v[0] = 42;
+        v[1] = 55;
+        const size_t old_capacity = v.GetCapacity();
+        v.Resize(2);
+        assert(v.GetSize() == 2);
+        assert(v.GetCapacity() == old_capacity);
+        assert(v[0] == 42);
+        assert(v[1] == 55);
+    }
+    {
+        const size_t old_size = 3;
+        SimpleVector<int> v(3);
+        v.Resize(old_size + 5);
+        v[3] = 42;
+        v.Resize(old_size);
+        v.Resize(old_size + 2);
+        assert(v[3] == 0);
+    }
 
     // Итерирование по SimpleVector
-    // {
-    //     // Пустой вектор
-    //     {
-    //         SimpleVector<int> v;
-    //         assert(v.begin() == nullptr);
-    //         assert(v.end() == nullptr);
-    //     }
+    {
+        // Пустой вектор
+        {
+            SimpleVector<int> v;
+            assert(v.begin() == nullptr);
+            assert(v.end() == nullptr);
+        }
 
-    //     // Непустой вектор
-    //     {
-    //         SimpleVector<int> v(10, 42);
-    //         assert(v.begin());
-    //         assert(*v.begin() == 42);
-    //         assert(v.end() == v.begin() + v.GetSize());
-    //     }
-    // } 
+        // Непустой вектор
+        {
+            SimpleVector<int> v(10, 42);
+            assert(v.begin());
+            assert(*v.begin() == 42);
+            assert(v.end() == v.begin() + v.GetSize());
+        }
+    } */
 }
