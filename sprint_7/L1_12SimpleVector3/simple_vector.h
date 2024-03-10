@@ -10,6 +10,24 @@
 
 #include "array_ptr.h"
 
+// класс-обертка
+class ReserveProxyObj {
+public:
+    explicit ReserveProxyObj(size_t capacity_to_reserve)
+        : capacity_(capacity_to_reserve) {
+    }
+    auto GetObjCapacity() {
+        return capacity_;
+    }
+
+private:
+    size_t capacity_;
+};
+
+ReserveProxyObj Reserve(size_t capacity_to_reserve) {
+    return ReserveProxyObj(capacity_to_reserve);
+}
+
 template <typename Type>
 class SimpleVector {
 public:
@@ -59,6 +77,14 @@ public:
             }
         }
     }
+
+    SimpleVector(ReserveProxyObj rpo) : capacity_(rpo.GetObjCapacity())
+                                         {
+    }
+
+    //     void ReserveProxyObj(size_t capacity_to_reserve) {
+    //         SimpleVector(capacity_to_reserve);
+    // }
 
     // Возвращает количество элементов в массиве
     size_t GetSize() const noexcept {
@@ -208,24 +234,24 @@ public:
             items_.swap(u.items_);
             size_ = u.GetSize();
             capacity_ = u.GetCapacity();
-            p = end()-1;
+            p = end() - 1;
         } else if (size_ == 0) {
             PushBack(value);
         } else if (size_ > 0 && size_ < capacity_) {
-            std::copy_backward(p, end(), end()+1);
+            std::copy_backward(p, end(), end() + 1);
             *p = value;
             ++size_;
         } else if (size_ == capacity_) {
-            SimpleVector<Type> u(2*capacity_);
+            SimpleVector<Type> u(2 * capacity_);
             u.size_ = size_;
             std::copy(begin(), p, u.begin());
-            std::copy_backward(p, end(), u.end()+1);
+            std::copy_backward(p, end(), u.end() + 1);
             auto n = std::distance(begin(), p);
             u[n] = value;
             items_.swap(u.items_);
             ++size_;
             capacity_ = u.capacity_;
-            p = begin() + n; 
+            p = begin() + n;
         }
         return p;
     }
@@ -250,6 +276,15 @@ public:
         items_.swap(other.items_);
         std::swap(size_, other.size_);
         std::swap(capacity_, other.capacity_);
+    }
+
+    void Reserve(size_t new_capacity) {
+        if (new_capacity > GetCapacity()) {
+            SimpleVector<Type> u(new_capacity);
+            std::copy(begin(), end(), u.begin());
+            items_.swap(u.items_);
+            capacity_ = new_capacity;
+        }
     }
 
 private:
@@ -287,3 +322,4 @@ template <typename Type>
 inline bool operator>=(const SimpleVector<Type> &lhs, const SimpleVector<Type> &rhs) {
     return !(lhs < rhs);
 }
+

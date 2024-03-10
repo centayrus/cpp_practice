@@ -208,10 +208,33 @@ inline void Test2() {
 
     // Вставка элементов
      {
-        SimpleVector<int> v{1, 2, 3, 4};
+     //   SimpleVector<int> v;
+       /*  v.Insert(v.begin(), 42);
+        assert((v == SimpleVector<int>{1, 2, 42, 3, 4}));
         v.Insert(v.begin() + 2, 42);
         assert((v == SimpleVector<int>{1, 2, 42, 3, 4}));
-        assert(v.Insert(v.end(), -10) == v.end()-1);
+        assert(v.Insert(v.end(), 1) == v.end()-1);
+        
+        assert(v.Insert(v.end(), -10) == v.end() - 1);
+        v.Insert(v.begin()+2, 44); */
+        //  assert(v.GetSize() == 1u);
+         //assert(v[0] == static_cast<int>(1));
+        SimpleVector<int> v;
+        int l = 1;
+        for (size_t i = 0; i < 100; ++i) {
+            v.Insert(v.begin(), l);
+            ++l;
+        }
+    
+        for (size_t i = 0; i < 100; ++i) {
+         std::cout << v[i] << " ";
+        }
+        //  int l = 1;
+        // for (size_t i = 0; i < 100; ++i) {
+        //     v.Insert(v.begin()+i, l);
+        //     assert(v[i] == static_cast<int>(i + 1));
+        //     ++l;
+        // }
     }
 
     // Удаление элементов

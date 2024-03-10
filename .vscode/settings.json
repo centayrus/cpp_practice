@@ -63,7 +63,8 @@
     "codecvt": "cpp",
     "bitset": "cpp",
     "regex": "cpp",
-    "list": "cpp"
+    "list": "cpp",
+    "cassert": "cpp"
   },
   "C_Cpp.default.compilerPath": "/usr/bin/g++",
   "C_Cpp.intelliSenseEngineFallback": "enabled",
