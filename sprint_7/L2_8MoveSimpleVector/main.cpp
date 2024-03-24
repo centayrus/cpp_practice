@@ -135,6 +135,8 @@ void TestNoncopiableInsert() {
     assert(v.GetSize() == size + 3);
     assert((v.begin() + 3)->GetX() == size + 3);
     cout << "Done!" << endl << endl;
+
+    assert(std::all_of(v.begin()+3u, v.end(), [](const X& item) { return item.GetX() == 5; }));
 }
 
 void TestNoncopiableErase() {
