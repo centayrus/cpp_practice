@@ -34,8 +34,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": false,
-      "cwd": "/home/atamiev/GitHub/cpp_practice/sprint_7/L2_8MoveSimpleVector",
-      "program": "/home/atamiev/GitHub/cpp_practice/sprint_7/L2_8MoveSimpleVector/build/Debug/outDebug",
+      "cwd": "/home/atamiev/GitHub/cpp_practice/sprint_8/L1_5Theory",
+      "program": "/home/atamiev/GitHub/cpp_practice/sprint_8/L1_5Theory/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
