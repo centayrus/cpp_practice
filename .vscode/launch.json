@@ -34,8 +34,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": false,
-      "cwd": "/home/atamiev/GitHub/cpp_practice/sprint_8/L1_5Theory",
-      "program": "/home/atamiev/GitHub/cpp_practice/sprint_8/L1_5Theory/build/Debug/outDebug",
+      "cwd": "/home/atamiev/GitHub/cpp_practice/sprint_8/L1_5VehiclePlate2",
+      "program": "/home/atamiev/GitHub/cpp_practice/sprint_8/L1_5VehiclePlate2/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
