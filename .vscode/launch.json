@@ -34,8 +34,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": false,
-      "cwd": "/home/atamiev/GitHub/cpp_practice/sprint_8/L1_7DumbbellHash",
-      "program": "/home/atamiev/GitHub/cpp_practice/sprint_8/L1_7DumbbellHash/build/Debug/outDebug",
+      "cwd": "/home/atamiev/GitHub/cpp_practice/sprint_8/L2_4IniReader",
+      "program": "/home/atamiev/GitHub/cpp_practice/sprint_8/L2_4IniReader/build/Release/outRelease",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
