@@ -22,11 +22,7 @@ public:
         if (sections_.count(name) != 0) {
             return sections_.at(name);
         }
-     //   std::unordered_map<std::string, std::string> sec;
-     //Section s = {};
-        auto s = std::pair<string, string>{};
-        return s;
-        
+        return null_sec_;
     }
 
     std::size_t GetSectionCount() const {
@@ -35,6 +31,7 @@ public:
 
 private:
     std::unordered_map<std::string, Section> sections_;
+    Section null_sec_;
 };
 
 Document Load(std::istream &input) {
@@ -47,9 +44,6 @@ Document Load(std::istream &input) {
             continue;
         }
         if (line.find_first_of("[", 0) != string::npos) {
-            // string sec_name = line.substr(line.find_first_not_of(" ["),
-            //                           line.find_last_not_of(" ]") - line.find_first_not_of(" [")-1);
-            //  string sec_name(line.find("[") + 1, line.find("]"));
             auto pos_start = find(line.begin(), line.end(), '[');
             auto pos_end = find(pos_start, line.end(), ']');
             new_sec = &ini_doc_fill.AddSection({pos_start + 1, pos_end});

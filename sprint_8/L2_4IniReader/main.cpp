@@ -8,6 +8,40 @@
 
 using namespace std;
 
+void TestLoadIni() {
+    istringstream input(
+        R"([july]
+food=2500
+sport=12000
+travel=23400
+clothes=5200
+[august]
+food=3250
+sport=10000
+travel=0
+clothes=8300
+jewelery=25000
+)"s);
+
+    const ini::Document doc = ini::Load(input);
+
+    assert(doc.GetSectionCount() == 2u);
+
+    const ini::Section expected_july = {
+        {"food"s, "2500"s},
+        {"sport"s, "12000"s},
+        {"travel"s, "23400"s},
+        {"clothes"s, "5200"s},
+    };
+
+    const ini::Section expected_august = {
+        {"food"s, "3250"s}, {"sport"s, "10000"s}, {"travel"s, "0"s}, {"clothes"s, "8300"s}, {"jewelery"s, "25000"s},
+    };
+
+    assert(doc.GetSection("july"s) == expected_july);
+    assert(doc.GetSection("august"s) == expected_august);
+}
+
 int main() {
     std::istringstream input{
         "[vegetables]\n"
@@ -36,4 +70,6 @@ int main() {
 
     doc.AddSection("pets"s) = ini::Section{{"nasty"s, "rat"s}};
     assert(doc.GetSectionCount() == 4);
+
+    TestLoadIni();
 }

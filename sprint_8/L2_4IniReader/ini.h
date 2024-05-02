@@ -21,6 +21,7 @@ public:
 
 private:
     std::unordered_map<std::string, Section> sections_;
+    Section null_sec_;
 };
 
 // определение этой функции должно быть в файле ini.cpp
