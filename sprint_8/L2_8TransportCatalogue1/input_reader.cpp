@@ -102,6 +102,26 @@ void InputReader::ParseLine(std::string_view line) {
     }
 }
 
-void InputReader::ApplyCommands([[maybe_unused]] TransportCatalogue& catalogue) const {
-    // Реализуйте метод самостоятельно
+void InputReader::ApplyCommands([[maybe_unused]] TransportCatalogue &catalogue) const {
+    std::unordered_map<QueryType, CommandDescription> query_queue;
+    for (const auto &command : commands_) {
+        auto com = Trim(command.command);
+        if (command && com == "Bus") {
+            query_queue.insert({QueryType::BUS, command});
+        } else if (command && com == "Stop") {
+            query_queue.insert({QueryType::STOP, command});
+        }
+    }
+    for (const auto &[el, command] : query_queue) {
+        if (el == QueryType::STOP) {
+            Coordinates c = ParseCoordinates(std::move(command.description));
+            catalogue.AddStop(command.id, c);
+        }
+    }
+    for (const auto &[el, command] : query_queue) {
+        if (el == QueryType::BUS) {
+           // std::vector<std::string_view> r = ParseRoute(command.description);
+            catalogue.AddBus(command.id, ParseRoute(std::move(command.description)));
+        }
+    }
 }
