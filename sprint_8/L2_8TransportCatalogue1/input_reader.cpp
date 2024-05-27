@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cassert>
 #include <iterator>
+#include <iostream>
 
 /**
  * Парсит строку вида "10.123,  -30.1837" и возвращает пару координат (широта, долгота)
@@ -103,24 +104,19 @@ void InputReader::ParseLine(std::string_view line) {
 }
 
 void InputReader::ApplyCommands([[maybe_unused]] TransportCatalogue &catalogue) const {
-    std::unordered_map<QueryType, CommandDescription> query_queue;
+    std::vector<CommandDescription> query_queue;
     for (const auto &command : commands_) {
-        auto com = Trim(command.command);
-        if (command && com == "Bus") {
-            query_queue.insert({QueryType::BUS, command});
-        } else if (command && com == "Stop") {
-            query_queue.insert({QueryType::STOP, command});
-        }
+        query_queue.push_back(command);
     }
-    for (const auto &[el, command] : query_queue) {
-        if (el == QueryType::STOP) {
+    std::sort(query_queue.begin(), query_queue.end(), [] (CommandDescription lhs, CommandDescription rhs) {
+        return lhs.command > rhs.command;
+    });
+
+    for (const CommandDescription &command : query_queue) {
+        if (Trim(command.command) == "Stop") {
             Coordinates c = ParseCoordinates(std::move(command.description));
-            catalogue.AddStop(command.id, c);
-        }
-    }
-    for (const auto &[el, command] : query_queue) {
-        if (el == QueryType::BUS) {
-           // std::vector<std::string_view> r = ParseRoute(command.description);
+            catalogue.AddStop(command.id, std::move(c));
+        } else {
             catalogue.AddBus(command.id, ParseRoute(std::move(command.description)));
         }
     }

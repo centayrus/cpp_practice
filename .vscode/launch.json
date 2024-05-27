@@ -34,8 +34,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": false,
-      "cwd": "/home/atamiev/GitHub/cpp_practice/sprint_8/L2_4IniReader",
-      "program": "/home/atamiev/GitHub/cpp_practice/sprint_8/L2_4IniReader/build/Release/outRelease",
+      "cwd": "/home/atamiev/GitHub/cpp_practice/sprint_9/L1_5CopyOnWrite",
+      "program": "/home/atamiev/GitHub/cpp_practice/sprint_9/L1_5CopyOnWrite/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

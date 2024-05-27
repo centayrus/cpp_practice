@@ -23,7 +23,6 @@ struct CommandDescription {
 
 class InputReader {
 public:
-    enum class QueryType { STOP, BUS };
     /**
      * Парсит строку в структуру CommandDescription и сохраняет результат в commands_
      */

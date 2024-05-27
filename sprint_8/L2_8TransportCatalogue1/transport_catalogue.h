@@ -19,10 +19,21 @@ struct Stop {
 
 struct Bus {
     std::string bus_route;
-    std::vector<Stop*> stops;
+    std::vector<Stop *> stops;
 };
 
 struct BusStat {
+    explicit operator bool() const {
+        if (stop_count) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    bool operator!() const {
+        return !operator bool();
+    }
     int stop_count;
     int uniq_stops;
     double total_distance;
@@ -31,12 +42,19 @@ struct BusStat {
 class TransportCatalogue {
 
 public:
+    void AddStop(const std::string &stop_name, const Coordinates &coordinate);
 
-void AddStop(const std::string& stop_name, const Coordinates& coordinate);
+    void AddBus(const std::string &bus_name, const std::vector<std::string_view> route);
 
-void AddBus(const std::string& bus_name, const std::vector<std::string_view> route);
+    BusStat FindBus(std::string_view request) const;
 
-BusStat FindBus(std::string_view request) const;
+    size_t GetStopCount() const;
+
+    size_t GetBusCount() const;
+
+    size_t GetStopnameToStopSize() const;
+
+    size_t GetBusnameToBusSize() const;
 
 private:
     std::deque<Stop> stops_list_;
