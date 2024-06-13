@@ -16,31 +16,46 @@ public:
     // Фабрика должна вернуть shared_ptr<Value> либо unique_ptr<Value>.
     // Пример использования:
     // shared_ptr<Value> value = value_factory(key);
-    explicit Cache(ValueFactoryFn value_factory) {
+    explicit Cache(ValueFactoryFn value_factory)
+        : factory_(value_factory) {
+
         // Реализуйте конструктор самостоятельно
     }
 
     // Возвращает закешированное значение по ключу. Если значение отсутствует или уже удалено,
     // оно должно быть создано с помощью фабрики и сохранено в кеше.
     // Если на объект нет внешних ссылок, он должен быть удалён из кеша
-    std::shared_ptr<Value> GetValue(const Key& key) {
-        (void) key;
-        // Заглушка. Реализуйте метод самостоятельно
-        return nullptr;
+    std::shared_ptr<Value> GetValue(const Key &key) {
+        auto key_pos = cache_.find(key);
+        if (key_pos != cache_.end()) {
+            if (!key_pos->second.lock()) {
+                cache_.erase(key);
+            } else {
+                return key_pos->second.lock();
+            }
+        }
+        auto val = factory_(key);
+        std::weak_ptr<Value> weak_val(val);
+        cache_[key] = weak_val;
+        return val;
     }
+
+private:
+    ValueFactoryFn factory_;
+    std::unordered_map<std::string, std::weak_ptr<Value>> cache_;
 };
 
 // Пример объекта, находящегося в кеше
 class Object {
 public:
     explicit Object(std::string id)
-        : id_(std::move(id))  //
+        : id_(std::move(id)) //
     {
         using namespace std;
         cout << "Object '"sv << id_ << "' has been created"sv << endl;
     }
 
-    const std::string& GetId() const {
+    const std::string &GetId() const {
         return id_;
     }
 
@@ -91,14 +106,13 @@ void Test1() {
     cout << "---"sv << endl;
     // Объект Bob будет удалён после разрушения указателя bob
 
-    alice1 = cache.GetValue("Alice"s);  // объект 'Alice' будет создан заново
+    alice1 = cache.GetValue("Alice"s); // объект 'Alice' будет создан заново
     cout << "---"sv << endl;
 }
 
 struct Book {
     Book(std::string title, std::string content)
-        : title(std::move(title))
-        , content(std::move(content)) {
+        : title(std::move(title)), content(std::move(content)) {
     }
 
     std::string title;
@@ -111,8 +125,8 @@ public:
     using BookStore = std::unordered_map<std::string, std::string>;
 
     // Принимает константную ссылку на хранилище книг и ссылку на переменную-счётчик загрузок
-    explicit BookLoader(const BookStore& store, size_t& load_count) {
-        // Реализуйте конструктор самостоятельно
+    explicit BookLoader(const BookStore &store, size_t &load_count)
+        : store_(store), load_cou_(load_count) {
     }
 
     // Загружает книгу из хранилища по её названию и возвращает указатель
@@ -120,15 +134,19 @@ public:
     // нужно увеличить значения счётчика загрузок load_count, переданного в конструктор, на 1.
     // Если книга в хранилище отсутствует, нужно выбросить исключение std::out_of_range,
     // а счётчик не увеличивать
-    std::shared_ptr<Book> operator()(const std::string& title) const {
-        // Заглушка, реализуйте метод самостоятельно
-        (void) title;
-        throw std::out_of_range("Not implemented"s);
+    std::shared_ptr<Book> operator()(const std::string &title) const {
+        auto title_pos = store_.find(title);
+        if (title_pos == store_.end()) {
+            throw std::out_of_range("Not implemented");
+        }
+        Book load_book(title_pos->first, title_pos->second);
+        ++load_cou_;
+        return std::make_shared<Book>(load_book);
     }
 
 private:
-    // Добавьте необходимые данные и/или методы
-    BookStore book_store_
+    const BookStore& store_;
+    size_t &load_cou_;
 };
 
 void Test2() {
@@ -173,7 +191,7 @@ void Test2() {
         book_cache.GetValue("Fifty Shades of Grey"s);
         // BookLoader выбросит исключение при попытке загрузить несуществующую книгу
         assert(false);
-    } catch (const std::out_of_range&) {
+    } catch (const std::out_of_range &) {
         /* Всё нормально. Такой книги нет в книгохранилище */
     } catch (...) {
         cout << "Unexpected exception"sv << endl;
