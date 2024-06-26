@@ -31,6 +31,7 @@
 *.out
 *.app
 
+
 # VScode files
 .vscode/
 
@@ -59,3 +60,8 @@ build/
 *.log
 *.tlog
 *.lastbuildstate
+
+# Игнорировать все файлы без расширения, кроме указанных
+*
+!*/
+!*.*

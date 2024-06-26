@@ -58,8 +58,9 @@ public:
 
     StopStat ReportStopStatistic(std::string_view stopname) const;
 
-    void SetDistance();
+    void SetDistance(const std::string &stop_name, const distances &dist);
 
+    double GetDistance() const;
     double GetDistance() const;
 
 
@@ -69,6 +70,7 @@ private:
     std::deque<Bus> bus_routes_;
     std::unordered_map<std::string_view, Bus *> busname_to_bus_;
     std::unordered_map<std::string_view, std::unordered_set<const Bus *>> stopname_to_bus_;
+    std::unordered_map<std::string_view, distances> distances_;
 
     void BusToStopFill(const Bus* bus_route, std::vector<const Stop *> stop_list);
 };

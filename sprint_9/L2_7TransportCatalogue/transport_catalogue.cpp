@@ -85,10 +85,22 @@ StopStat TransportCatalogue::ReportStopStatistic(std::string_view stopname) cons
     return {stop, v_stop_stat};
 }
 
-    // void TransportCatalogue::SetDistance() {
-        
-    // }
+    void TransportCatalogue::SetDistance(const std::string &stop_name, const distances &dist) {
+            stops_list_.push_back({stop_name, coordinate});
+    auto stop_ptr = &stops_list_.back();
+    stopname_to_stop_.fin
+    }
 
-    // double TransportCatalogue::GetDistance() const {
+    double TransportCatalogue::GetDistance() const {
 
-    // }
+    }
+
+    void TransportCatalogue::SetDistance(const std::string &stop_name, const distances &dist) {
+            stops_list_.push_back({stop_name, coordinate});
+    auto stop_ptr = &stops_list_.back();
+    stopname_to_stop_.fin
+    }
+
+    double TransportCatalogue::GetDistance() const {
+
+    }

@@ -1,16 +1,18 @@
 #include <iostream>
-#include <algorithm>
 #include <string>
+#include <algorithm>
 
 int main() {
     std::string text = "100m to Marushkino";
-    std::string to_search = "to ";
-    auto to_pos = std::find_end(text.begin(), text.end(), to_search.begin(), to_search.end());
+    std::string delimiter = "to ";
+    auto start_pos = text.find(delimiter);
 
-    if (to_pos != text.end()) {
-        auto end_pos = std::find(to_pos, text.end(), 'm');
-        std::string result(to_pos + to_search.length(), end_pos != text.end() ? end_pos : text.end());
-        std::cout << "Извлеченный текст: " << result << std::endl;
+    if (start_pos != std::string::npos) {
+        start_pos += delimiter.length(); // Сдвигаем позицию на длину разделителя
+        std::string result = text.substr(start_pos);
+        std::cout << "Текст после 'to ': " << result << std::endl;
+    } else {
+        std::cout << "Разделитель 'to ' не найден." << std::endl;
     }
 
     return 0;
