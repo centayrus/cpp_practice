@@ -2,9 +2,11 @@
 
 #include <algorithm>
 #include <cassert>
-#include <iterator>
 #include <iostream>
+#include <iterator>
+#include <regex>
 
+using distances = std::unordered_map<std::string_view, int>;
 /**
  * Парсит строку вида "10.123,  -30.1837" и возвращает пару координат (широта, долгота)
  */
@@ -19,11 +21,34 @@ Coordinates ParseCoordinates(std::string_view str) {
     }
 
     auto not_space2 = str.find_first_not_of(' ', comma + 1);
+    auto not_space3 = str.find_first_of(',', not_space2 + 1);
 
     double lat = std::stod(std::string(str.substr(not_space, comma - not_space)));
-    double lng = std::stod(std::string(str.substr(not_space2)));
+    double lng = std::stod(std::string(str.substr(not_space2, not_space3 - not_space2)));
 
     return {lat, lng};
+}
+
+distances ParseDistances(const std::string &str) {
+    // std::regex regex("(\\d+m+[' ']{1,}+to)");
+    // Позиция первой запятой
+    size_t firstCommaPos = str.find(',');
+    // Позиция второй запятой
+    size_t secondCommaPos = str.find(',', firstCommaPos + 1);
+    std::string substr = str.substr(secondCommaPos+1);
+    // std::cout << substr << '\n';
+    std::regex regex("(\\d+m\\s+to\\s+[^,]+)");
+    std::sregex_iterator begin(substr.begin(), substr.end(), regex);
+    std::sregex_iterator end;
+    distances dist_map;
+    while (begin != end) {
+        std::smatch match = *begin;
+        // std::cout << match.str() << '\n'; // Выводит найденные вхождения
+        std::find_first_of(match.str(), 'm');
+        ++begin;
+        
+    }
+    return {};
 }
 
 /**
@@ -109,14 +134,16 @@ void InputReader::ApplyCommands([[maybe_unused]] TransportCatalogue &catalogue) 
         query_queue.push_back(command);
     }
     // Сортировка запросов по типу
-    std::sort(query_queue.begin(), query_queue.end(), [] (CommandDescription lhs, CommandDescription rhs) {
+    std::sort(query_queue.begin(), query_queue.end(), [](CommandDescription lhs, CommandDescription rhs) {
         return lhs.command > rhs.command;
     });
     // Обработка запросов согласно очередности
     for (const CommandDescription &command : query_queue) {
         if (Trim(command.command) == "Stop") {
+            distances dist = ParseDistances(command.description);
             Coordinates c = ParseCoordinates(std::move(command.description));
             catalogue.AddStop(command.id, std::move(c));
+            // catalogue.SetDistance(command.id, );
         } else {
             catalogue.AddBus(command.id, ParseRoute(std::move(command.description)));
         }

@@ -84,3 +84,11 @@ StopStat TransportCatalogue::ReportStopStatistic(std::string_view stopname) cons
     });
     return {stop, v_stop_stat};
 }
+
+    // void TransportCatalogue::SetDistance() {
+        
+    // }
+
+    // double TransportCatalogue::GetDistance() const {
+
+    // }

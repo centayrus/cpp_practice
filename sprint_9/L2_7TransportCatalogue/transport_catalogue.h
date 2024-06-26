@@ -58,11 +58,10 @@ public:
 
     StopStat ReportStopStatistic(std::string_view stopname) const;
 
-    // void PrintStopStat(std::ostream& output, const StopStat& stop_stat, std::string_view request) const;
+    void SetDistance();
 
-    // void PrintBusStat(std::ostream& output, const BusStat& bus_stat, std::string_view request) const;
+    double GetDistance() const;
 
-// думаю, остальные методы, которые в программе не востребованы пока можно убрать, что я и сделал
 
 private:
     std::deque<Stop> stops_list_;
