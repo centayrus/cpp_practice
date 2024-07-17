@@ -1,5 +1,0 @@
-shakespeare/a.txt
->10
->abc
-b.txt
->123

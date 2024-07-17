@@ -13,7 +13,6 @@ void TransportCatalogue::AddStop(const std::string &stop_name, const Coordinates
 // Добавление маршрута в базу
 void TransportCatalogue::AddBus(const std::string &bus_name, const std::vector<std::string_view> &route) {
     std::vector<const Stop *> stop_list_for_bus;
-
     for (const auto &stop : route) {
         if (stopname_to_stop_.count(stop)) {
             Stop *stop_ptr = stopname_to_stop_.at(stop);
@@ -85,22 +84,13 @@ StopStat TransportCatalogue::ReportStopStatistic(std::string_view stopname) cons
     return {stop, v_stop_stat};
 }
 
-    void TransportCatalogue::SetDistance(const std::string &stop_name, const distances &dist) {
-            stops_list_.push_back({stop_name, coordinate});
-    auto stop_ptr = &stops_list_.back();
-    stopname_to_stop_.fin
+void TransportCatalogue::SetDistance(const std::string &stop_name, const std::unordered_map<std::string, double> &dist) {
+    auto a_stop_ptr = *stopname_to_stop_.find(stop_name)->second;
+    for (const auto &stop_distance : dist) {
+        auto b_stop_ptr = *stopname_to_stop_.find(stop_distance.first)->second;
+        a_stop_ptr.distance[{&a_stop_ptr, &b_stop_ptr}] = stop_distance.second;
     }
+}
 
-    double TransportCatalogue::GetDistance() const {
-
-    }
-
-    void TransportCatalogue::SetDistance(const std::string &stop_name, const distances &dist) {
-            stops_list_.push_back({stop_name, coordinate});
-    auto stop_ptr = &stops_list_.back();
-    stopname_to_stop_.fin
-    }
-
-    double TransportCatalogue::GetDistance() const {
-
-    }
+// double TransportCatalogue::GetDistance() const {
+// }
