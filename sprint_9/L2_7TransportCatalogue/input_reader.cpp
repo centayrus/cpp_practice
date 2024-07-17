@@ -3,12 +3,10 @@
 #include <algorithm>
 #include <cassert>
 #include <iostream>
-#include <iostream>
 #include <iterator>
 #include <regex>
-#include <regex>
 
-using distances = std::unordered_map<std::string, int>;
+using distances = std::unordered_map<std::string, double>;
 /**
  * Парсит строку вида "10.123,  -30.1837" и возвращает пару координат (широта, долгота)
  */
@@ -24,12 +22,9 @@ Coordinates ParseCoordinates(std::string_view str) {
 
     auto not_space2 = str.find_first_not_of(' ', comma + 1);
     auto not_space3 = str.find_first_of(',', not_space2 + 1);
-    auto not_space3 = str.find_first_of(',', not_space2 + 1);
 
     double lat = std::stod(std::string(str.substr(not_space, comma - not_space)));
     double lng = std::stod(std::string(str.substr(not_space2, not_space3 - not_space2)));
-    double lng = std::stod(std::string(str.substr(not_space2, not_space3 - not_space2)));
-
     return {lat, lng};
 }
 
@@ -50,7 +45,7 @@ distances ParseDistances(std::string_view str) {
     std::sregex_iterator begin(substring.begin(), substring.end(), regex);
     std::sregex_iterator end;
     distances dist_to_stop;
-    int meters;
+    double meters;
     std::string stop;
     while (begin != end) {
         std::smatch match = *begin;
@@ -58,7 +53,7 @@ distances ParseDistances(std::string_view str) {
         auto not_space = match.str().find_first_not_of(' ');
         // std::string s = match.str();
         auto m_pos = match.str().find_first_of('m');
-        meters = std::stoi(match.str().substr(not_space, m_pos - not_space)); // расстояние
+        meters = std::stod(match.str().substr(not_space, m_pos - not_space)); // расстояние
         // std::cout << "meters: " << meters;
         // Поиск остановки
         std::string delimiter = "to ";
@@ -66,9 +61,9 @@ distances ParseDistances(std::string_view str) {
         stop = "";
         if (start_pos != std::string::npos) {
             // Сдвигаем позицию на длину разделителя
-            start_pos += delimiter.length(); 
+            start_pos += delimiter.length();
             stop = match.str().substr(start_pos);
-            std::cout << " - stop: " << stop << '\n';
+            //std::cout << " - stop: " << stop << '\n';
         }
         dist_to_stop.insert({stop, meters});
         ++begin;
@@ -160,19 +155,21 @@ void InputReader::ApplyCommands([[maybe_unused]] TransportCatalogue &catalogue) 
     }
     // Сортировка запросов по типу
     std::sort(query_queue.begin(), query_queue.end(), [](CommandDescription lhs, CommandDescription rhs) {
-    std::sort(query_queue.begin(), query_queue.end(), [](CommandDescription lhs, CommandDescription rhs) {
         return lhs.command > rhs.command;
     });
     // Обработка запросов согласно очередности
     for (const CommandDescription &command : query_queue) {
         if (Trim(command.command) == "Stop") {
-            distances distance = ParseDistances(command.description);
-            Coordinates c = ParseCoordinates(std::move(command.description));
+            Coordinates c = ParseCoordinates(std::move(command.description)); // убрать мув
             catalogue.AddStop(command.id, std::move(c));
-            catalogue.SetDistance(command.id, distance);
         } else {
             catalogue.AddBus(command.id, ParseRoute(std::move(command.description)));
         }
     }
+    for (const CommandDescription &command : query_queue) {
+        if (Trim(command.command) == "Stop") {
+            distances distance = ParseDistances(command.description);
+            catalogue.SetDistance(command.id, distance);
+        }
+    }
 }
-
