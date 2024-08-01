@@ -1,12 +1,16 @@
 #include "input_reader.h"
+#include "log_duration.h"
 
 #include <algorithm>
 #include <cassert>
+#include <chrono>
 #include <iostream>
 #include <iterator>
 #include <regex>
 
-using distances = std::unordered_map<std::string, double>;
+// using distances = std::unordered_map<std::string, double>;
+using distances = std::vector<std::pair<std::string, double>>;
+using Clock = std::chrono::steady_clock;
 /**
  * Парсит строку вида "10.123,  -30.1837" и возвращает пару координат (широта, долгота)
  */
@@ -28,45 +32,37 @@ Coordinates ParseCoordinates(std::string_view str) {
     return {lat, lng};
 }
 
-distances ParseDistances(std::string_view str) {
+distances ParseDistances(std::string str) {
     // Позиция первой запятой
-    size_t firstCommaPos = str.find(',');
-    if (firstCommaPos == str.npos) {
+    size_t first_comma_pos = str.find(',');
+    if (first_comma_pos == str.npos) {
         return {};
     }
     // Позиция второй запятой
-    size_t secondCommaPos = str.find(',', firstCommaPos + 1);
-    if (secondCommaPos == str.npos) {
+    size_t second_comma_pos = str.find(',', first_comma_pos + 1);
+    if (second_comma_pos == str.npos) {
         return {};
     }
-    std::string substring = std::string(str.substr(secondCommaPos + 1));
-    // std::cout << substr << '\n';
-    std::regex regex("(\\d+m\\s+to\\s+[^,]+)");
-    std::sregex_iterator begin(substring.begin(), substring.end(), regex);
-    std::sregex_iterator end;
-    distances dist_to_stop;
-    double meters;
-    std::string stop;
+    std::string substring = std::string(str.substr(second_comma_pos + 1));
+    auto begin = substring.begin();
+    auto end = substring.end();
+    std::string dist, to_stop;
+    //std::string delimiter = "to ";
     while (begin != end) {
-        std::smatch match = *begin;
-        // std::cout << match.str() << '\n'; // Выводит найденные вхождения
-        auto not_space = match.str().find_first_not_of(' ');
-        // std::string s = match.str();
-        auto m_pos = match.str().find_first_of('m');
-        meters = std::stod(match.str().substr(not_space, m_pos - not_space)); // расстояние
-        // std::cout << "meters: " << meters;
-        // Поиск остановки
-        std::string delimiter = "to ";
-        auto start_pos = match.str().find(delimiter);
-        stop = "";
-        if (start_pos != std::string::npos) {
-            // Сдвигаем позицию на длину разделителя
-            start_pos += delimiter.length();
-            stop = match.str().substr(start_pos);
-            //std::cout << " - stop: " << stop << '\n';
-        }
-        dist_to_stop.insert({stop, meters});
-        ++begin;
+        // берем первую комбинацию
+        auto pos_item_start = substring.find_first_not_of(' ');
+        auto pos_item_end = substring.find_first_of(',');
+        std::string item = substring.substr(pos_item_start, pos_item_end-pos_item_start-1);
+        std::string::size_type pos = substring.find("to");
+        std::string::size_type pos_m = substring.find("m");
+        // определение дистанции
+        std::string dist = substring.substr(pos_item_start, pos_m-pos_item_start-1);
+                
+
+
+
+
+        substring.find_last_not_of
     }
     return dist_to_stop;
 }
@@ -158,6 +154,8 @@ void InputReader::ApplyCommands([[maybe_unused]] TransportCatalogue &catalogue) 
         return lhs.command > rhs.command;
     });
     // Обработка запросов согласно очередности
+    {
+            LOG_DURATION("ParseCoordinates");
     for (const CommandDescription &command : query_queue) {
         if (Trim(command.command) == "Stop") {
             Coordinates c = ParseCoordinates(std::move(command.description)); // убрать мув
@@ -166,10 +164,30 @@ void InputReader::ApplyCommands([[maybe_unused]] TransportCatalogue &catalogue) 
             catalogue.AddBus(command.id, ParseRoute(std::move(command.description)));
         }
     }
+    }
+        {
+            LOG_DURATION("ParseDistances");
     for (const CommandDescription &command : query_queue) {
-        if (Trim(command.command) == "Stop") {
-            distances distance = ParseDistances(command.description);
-            catalogue.SetDistance(command.id, distance);
+        distances distance;
+
+            if (command.command == "Stop") {
+                distance = ParseDistances(command.description);
+               // catalogue.SetDistance(command.id, distance);
+            }
         }
     }
+
+    {
+            LOG_DURATION("SetDistance");
+    for (const CommandDescription &command : query_queue) {
+        distances distance;
+
+            if (command.command == "Stop") {
+              //  distance = ParseDistances(command.description);
+                catalogue.SetDistance(command.id, {{"cdbsoind", 9500}});
+            }
+        }
+    }
+
 }
+
