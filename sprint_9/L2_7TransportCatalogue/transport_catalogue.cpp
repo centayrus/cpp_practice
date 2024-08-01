@@ -2,10 +2,11 @@
 
 #include <algorithm>
 #include <iomanip>
+#include <utility>
 
 // Добавление остановки в базу
 void TransportCatalogue::AddStop(const std::string &stop_name, const Coordinates &coordinate) {
-    stops_list_.push_back({stop_name, coordinate});
+    stops_list_.push_back({stop_name, coordinate, {}});
     auto stop_ptr = &stops_list_.back();
     stopname_to_stop_[stops_list_.back().stop_name] = stop_ptr;
 }
@@ -36,6 +37,16 @@ void TransportCatalogue::BusToStopFill(const Bus *bus_route, std::vector<const S
     }
 }
 
+double TransportCatalogue::GetDistance(const Stop *prev_stop, const Stop *cur_stop) const {
+    std::pair<const Stop *, const Stop *> key = std::make_pair(prev_stop, cur_stop);
+    auto value = prev_stop->distance.find(key);
+    if (value == prev_stop->distance.end()) {
+        key = std::make_pair(cur_stop, prev_stop);
+        value = prev_stop->distance.find(key);
+    }
+    return value->second;
+}
+
 // Поиск маршрута
 BusStat TransportCatalogue::ReportBusStatistic(std::string_view request) const {
     auto bus_pos = busname_to_bus_.find(request);
@@ -46,7 +57,9 @@ BusStat TransportCatalogue::ReportBusStatistic(std::string_view request) const {
     int common_stops_count = static_cast<int>(bus.stops.size());
     bool first_cycle = true;
     double total_distance = 0.;
+    double route_distance = 0.;
     Coordinates prev_location;
+    const Stop *prev_stop;
     std::unordered_set<std::string_view> uniq_stops;
     for (const auto *stop_item : bus.stops) {
         uniq_stops.insert(stop_item->stop_name);
@@ -56,11 +69,14 @@ BusStat TransportCatalogue::ReportBusStatistic(std::string_view request) const {
     for (const auto stop : bus.stops) {
         if (!first_cycle) {
             total_distance += ComputeDistance(prev_location, stop->coordinate);
+            route_distance += GetDistance(std::move(prev_stop), std::move(stop));
         }
         first_cycle = false;
         prev_location = stop->coordinate;
-    } //
-    return {common_stops_count, uniq_stops_count, total_distance};
+        prev_stop = stop;
+    }
+
+    return {common_stops_count, uniq_stops_count, route_distance, route_distance/total_distance};
 }
 
 StopStat TransportCatalogue::ReportStopStatistic(std::string_view stopname) const {
@@ -84,13 +100,11 @@ StopStat TransportCatalogue::ReportStopStatistic(std::string_view stopname) cons
     return {stop, v_stop_stat};
 }
 
-void TransportCatalogue::SetDistance(const std::string &stop_name, const std::unordered_map<std::string, double> &dist) {
-    auto a_stop_ptr = *stopname_to_stop_.find(stop_name)->second;
+void TransportCatalogue::SetDistance(const std::string_view stop_name, const std::vector<std::pair<std::string, double>> &dist) {
+    auto a_stop_ptr = stopname_to_stop_.find(stop_name)->second;
     for (const auto &stop_distance : dist) {
-        auto b_stop_ptr = *stopname_to_stop_.find(stop_distance.first)->second;
-        a_stop_ptr.distance[{&a_stop_ptr, &b_stop_ptr}] = stop_distance.second;
+        auto b_stop_ptr = stopname_to_stop_.find(stop_distance.first)->second;
+        a_stop_ptr->distance[{a_stop_ptr, b_stop_ptr}] = stop_distance.second;
+        b_stop_ptr->distance[{a_stop_ptr, b_stop_ptr}] = stop_distance.second;
     }
 }
-
-// double TransportCatalogue::GetDistance() const {
-// }

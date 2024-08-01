@@ -11,14 +11,13 @@
 #include <vector>
 
 #include "geo.h"
-
 //using stop_pair = std::unordered_map<std::pair<Stop*, Stop*>, double, StopDistanceHasher>;
 
 struct Stop;
 
 class StopDistanceHasher {
 public:
-    size_t operator()(const std::pair<Stop *, Stop *> &interval) const {
+    size_t operator()(const std::pair<const Stop *, const Stop *> &interval) const {
         std::hash<const void *> hasher;
         std::size_t h1 = hasher(interval.first);
         std::size_t h2 = hasher(interval.second);
@@ -35,7 +34,7 @@ private:
 struct Stop {
     std::string stop_name;
     Coordinates coordinate;
-    std::unordered_map<std::pair<Stop*, Stop*>, double, StopDistanceHasher> distance;
+    std::unordered_map<std::pair<const Stop*,const Stop*>, double, StopDistanceHasher> distance;
 };
 
 struct Bus {
@@ -54,6 +53,7 @@ struct BusStat {
     int stop_count;
     int uniq_stops;
     double total_distance;
+    double dist_proportion;
 };
 
 struct StopStat {
@@ -79,9 +79,9 @@ public:
 
     StopStat ReportStopStatistic(std::string_view stopname) const;
 
-    void SetDistance(const std::string &stop_name, const std::unordered_map<std::string, double> &dist);
+    void SetDistance(const std::string_view stop_name, const std::vector<std::pair<std::string, double>> &dist);
 
-    // double GetDistance() const;
+
 
 private:
     std::deque<Stop> stops_list_;
@@ -89,8 +89,8 @@ private:
     std::deque<Bus> bus_routes_;
     std::unordered_map<std::string_view, Bus *> busname_to_bus_;
     std::unordered_map<std::string_view, std::unordered_set<const Bus *>> stopname_to_bus_;
-    // std::unordered_map<std::string_view, std::unordered_map<std::string, int>> distances_;
 
     void BusToStopFill(const Bus *bus_route, std::vector<const Stop *> stop_list);
+    double GetDistance(const Stop *prev_stop, const Stop *cur_stop) const;
 };
 

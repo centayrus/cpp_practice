@@ -3,6 +3,16 @@
 #include <iomanip>
 #include <iterator>
 
+/**
+ * Удаляет пробелы в начале и конце строки
+ */
+std::string_view Trim2(std::string_view string) {
+    const auto start = string.find_first_not_of(' ');
+    if (start == string.npos) {
+        return {};
+    }
+    return string.substr(start, string.find_last_not_of(' ') + 1 - start);
+}
 
 void PrintStopStat(std::ostream &output, const StopStat &stop_stat, std::string_view request) {
     output << request;
@@ -24,7 +34,8 @@ void PrintStopStat(std::ostream &output, const StopStat &stop_stat, std::string_
 void PrintBusStat(std::ostream &output, const BusStat &bus_stat, std::string_view request) {
     if (bus_stat) {
         output << request << ": " << bus_stat.stop_count << " stops on route, " << bus_stat.uniq_stops
-               << " unique stops, " << bus_stat.total_distance << std::setprecision(6) << " route length" << "\n";
+               << " unique stops, " << bus_stat.total_distance << std::setprecision(6) << " route length, "
+               << bus_stat.dist_proportion << " curvature" << "\n";
     } else {
         output << request << ": not found" << '\n';
     }
@@ -38,18 +49,17 @@ void ParseAndPrintStat(const TransportCatalogue &tansport_catalogue, std::string
     size_t pos_second = request.find_first_of(' ', pos_first);
     std::string_view command = request.substr(pos_first, pos_second - pos_first);
     size_t pos_last = request.find_last_not_of(' ', pos_second);
-    req = request.substr(pos_second + 1, pos_last - pos_second - 1);
+    req = Trim2(request.substr(pos_second + 1, pos_last - pos_second - 1));
 
     // Вывод статистики по запросу маршрутов
     // Надеюсь правильно понял, что нужно вынести в методы справочника, а не отдельные функции в stat_reader...
     if (command == "Bus") {
         BusStat bus_stat = tansport_catalogue.ReportBusStatistic(req);
-        PrintBusStat(output, bus_stat, request);
+        PrintBusStat(output, bus_stat, Trim2(request));
     }
     // Вывод статистики по запросу остановок
-else if (command == "Stop") {
-    StopStat stop_stat = tansport_catalogue.ReportStopStatistic(req);
-    PrintStopStat(output, stop_stat, request);
+    else if (command == "Stop") {
+        StopStat stop_stat = tansport_catalogue.ReportStopStatistic(req);
+        PrintStopStat(output, stop_stat, Trim2(request));
+    }
 }
-}
-
