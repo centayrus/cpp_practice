@@ -139,7 +139,7 @@ void Text::RenderObject(const RenderContext &context) const {
 // ---------- End Text ------------------
 
 // ---------- Document ------------------
-void Document::AddPtr(std::unique_ptr<Object> &&obj) override {
+void Document::AddPtr(std::unique_ptr<Object> &&obj) {
     objects_ptr_.emplace_back(std::move(obj));
 }
 
