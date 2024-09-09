@@ -47,6 +47,33 @@ struct RenderContext {
     int indent = 0;
 };
 
+class Object;
+
+class ObjectContainer {
+public:
+
+    ObjectContainer() = default;
+    
+    template <typename Object>
+    void Add(Object object);
+
+    // Добавляет в svg-документ объект-наследник svg::Object
+    virtual void AddPtr(std::unique_ptr<svg::Object> &&obj) = 0;
+
+    //virtual ~ObjectContainer() = default;
+
+protected:
+    ~ObjectContainer() = default;
+    std::vector<std::unique_ptr<Object>> objects_ptr_;
+};
+
+class Drawable {
+public:
+    virtual void Draw(ObjectContainer &obj_container) const = 0;
+
+    virtual ~Drawable() = default;
+};
+
 /*
  * Абстрактный базовый класс Object служит для унифицированного хранения
  * конкретных тегов SVG-документа
@@ -54,12 +81,12 @@ struct RenderContext {
  */
 class Object {
 public:
-    void Render(const RenderContext& context) const;
+    void Render(const RenderContext &context) const;
 
     virtual ~Object() = default;
 
 private:
-    virtual void RenderObject(const RenderContext& context) const = 0;
+    virtual void RenderObject(const RenderContext &context) const = 0;
 };
 
 /*
@@ -135,7 +162,7 @@ private:
     std::string data_ = ""s;
 };
 
-class Document {
+class Document : public ObjectContainer {
 public:
     /*
      Метод Add добавляет в svg-документ любой объект-наследник svg::Object.
@@ -143,23 +170,24 @@ public:
      Document doc;
      doc.Add(Circle().SetCenter({20, 30}).SetRadius(15));
     */
-    template <typename Object>
-    void Add(Object object);
+     //   template <typename Object>
+    //   void Add(Object object);
 
     // Добавляет в svg-документ объект-наследник svg::Object
-    void AddPtr(std::unique_ptr<svg::Object> &&obj);
+    void AddPtr(std::unique_ptr<svg::Object> &&obj) override;
 
     // Выводит в ostream svg-представление документа
     void Render(std::ostream &out) const;
 
     // Прочие методы и данные, необходимые для реализации класса Document
 
-private:
-    std::vector<std::unique_ptr<Object>> objects_ptr_;
+    /*     private:
+            std::vector<std::unique_ptr<Object>> objects_ptr_;  */
+
 };
 
 template <typename Object>
-void Document::Add(Object object) {
+void ObjectContainer::Add(Object object) {
     objects_ptr_.emplace_back(std::make_unique<Object>(std::move(object)));
 }
 
