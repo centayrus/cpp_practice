@@ -6,12 +6,37 @@
 #include <optional>
 #include <string>
 #include <utility>
+#include <variant>
 #include <vector>
 
 using namespace std::literals;
 namespace svg {
 
-using Color = std::string;
+struct Rgb {
+    // public:
+    Rgb() = default;
+    Rgb(uint8_t r, uint8_t g, uint8_t b) : red(r), green(g), blue(b) {}
+
+    // private:
+    uint8_t red = 0;
+    uint8_t green = 0;
+    uint8_t blue = 0;
+};
+
+struct Rgba {
+    // public:
+    Rgba() = default;
+    Rgba(uint8_t r, uint8_t g, uint8_t b, double o) : red(r), green(g), blue(b), opacity(o) {}
+
+    // private:
+    uint8_t red = 0;
+    uint8_t green = 0;
+    uint8_t blue = 0;
+    double opacity = 1.0;
+};
+
+using Color = std::variant<std::monostate, std::string, svg::Rgb, svg::Rgba>;
+
 // Объявив в заголовочном файле константу со спецификатором inline,
 // мы сделаем так, что она будет одной на все единицы трансляции,
 // которые подключают этот заголовок.
@@ -71,7 +96,25 @@ struct RenderContext {
 
 std::ostream &operator<<(std::ostream &out, const svg::StrokeLineCap &line_cap);
 
-std::ostream &operator<<(std::ostream &out, const StrokeLineJoin &line_join);
+std::ostream &operator<<(std::ostream &out, const svg::StrokeLineJoin &line_join);
+
+struct OstreamColorPrint {
+    std::ostream &out;
+    void operator()(std::monostate) const {
+        out << "none"sv;
+    }
+    void operator()(std::string col) const {
+        out << col;
+    }
+    void operator()(svg::Rgb col) const {
+        out << "rgb("sv << static_cast<unsigned int>(col.red) << ","sv << static_cast<unsigned int>(col.green) << ","sv << static_cast<unsigned int>(col.blue) << ")"sv;
+    }
+    void operator()(svg::Rgba col) const {
+        out << "rgba("sv << static_cast<unsigned int>(col.red) << ","sv << static_cast<unsigned int>(col.green) << ","sv << static_cast<unsigned int>(col.blue) << "," << col.opacity << ")"sv;
+    }
+};
+
+std::ostream &operator<<(std::ostream &out, const svg::Color &col);
 
 template <typename Owner>
 class PathProps {

@@ -173,7 +173,7 @@ std::ostream &operator<<(std::ostream &out, const svg::StrokeLineCap &line_cap) 
     return out;
 }
 
-std::ostream &operator<<(std::ostream &out, const StrokeLineJoin &line_join) {
+std::ostream &operator<<(std::ostream &out, const svg::StrokeLineJoin &line_join) {
     switch (line_join) {
     case StrokeLineJoin::ARCS:
         out << "arcs"s;
@@ -191,6 +191,13 @@ std::ostream &operator<<(std::ostream &out, const StrokeLineJoin &line_join) {
         out << "round"s;
         break;
     }
+    return out;
+}
+
+std::ostream &operator<<(std::ostream &out, const svg::Color &col) {
+    std::ostringstream strm;
+    std::visit(OstreamColorPrint{strm}, col);
+    out << strm.str();
     return out;
 }
 } // namespace svg
