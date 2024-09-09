@@ -27,12 +27,13 @@ public:
     using Value = std::variant<std::nullptr_t, int, double, std::string, bool, Array, Dict>;
     /* Реализуйте Node, используя std::variant */
 
-    explicit Node(Array array);
-    explicit Node(Dict map);
+    explicit Node();
     explicit Node(int value);
-    explicit Node(std::string value);
     explicit Node(bool is_yn);
     explicit Node(double value);
+    explicit Node(std::string value);
+    explicit Node(Array array);
+    explicit Node(Dict map);
 
     int AsInt() const;
     bool AsBool() const;
@@ -42,24 +43,22 @@ public:
     const Array &AsArray() const;
     const Dict &AsMap() const;
 
+    bool IsNull() const;
     bool IsInt() const;
+    bool IsBool() const;
     bool IsDouble() const;     // Возвращает true, если в Node хранится int либо double.
     bool IsPureDouble() const; // Возвращает true, если в Node хранится double.
-    bool IsBool() const;
     bool IsString() const;
-    bool IsNull() const;
     bool IsArray() const;
     bool IsMap() const;
 
-    const Value &GetValue() const {
-        return value_;
-    }
+    const Value &GetValue() const;
 
 private:
     Value value_;
 };
 
-std::ostream &operator<<(std::ostream &out, const Node &node);
+
 
 // Шаблон, подходящий для вывода double и int
 template <typename Value>
@@ -79,7 +78,7 @@ void PrintValue(Array array, std::ostream &out) {
         if (!is_first) {
             out << ",";
         }
-        out << item;
+        out << PrintValue(item.GetValue(), out);;
         is_first = false;
     }
 }
@@ -90,7 +89,7 @@ void PrintValue(Dict dict, std::ostream &out) {
         if (!is_first) {
             out << ",";
         }
-        out << item.first << ": " << item.second;
+        out << item.first << ": " << PrintValue(item.second.GetValue(), out);
         is_first = false;
     }
 }
@@ -99,14 +98,12 @@ void PrintValue(bool b, std::ostream &out) {
     out << std::boolalpha << b;
 }
 
-// void PrintValue(std::string& str, std::ostream& out) {
-//     out << str;
-// }
-
 void PrintNode(const Node &node, std::ostream &out) {
+    std::ostringstream strm;
     std::visit(
-        [&out](const auto &value) { PrintValue(value, out); },
+        [&strm](const auto &value) { PrintValue(value, strm); },
         node.GetValue());
+        out << strm.str();
 }
 
 class Document {
@@ -122,5 +119,9 @@ private:
 Document Load(std::istream &input);
 
 void Print(const Document &doc, std::ostream &output);
+
+bool operator==(const json::Node &node1, const json::Node& node2);
+
+bool operator!=(const json::Node &node1, const json::Node& node2);
 
 } // namespace json

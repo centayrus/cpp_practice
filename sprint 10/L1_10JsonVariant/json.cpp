@@ -69,6 +69,7 @@ Node LoadNode(istream &input) {
 }
 
 } // namespace
+Node::Node() {}
 
 Node::Node(int value)
     : value_(value) {
@@ -174,9 +175,9 @@ Document::Document(Node root)
     : root_(move(root)) {
 }
 
-/* const Node::Value &Node::GetValue() const {
-    return value_.; 
-} */
+ const Node::Value &Node::GetValue() const {
+    return value_; 
+} 
 
 const Node &Document::GetRoot() const {
     return root_;
@@ -186,24 +187,41 @@ Document Load(istream &input) {
     return Document{LoadNode(input)};
 }
 
-std::ostream &operator<<(std::ostream &out, const Node &node) {
-    std::ostringstream strm;
-    visit(
-        [&strm](auto value) {
-            // Это универсальная лямбда-функция (generic lambda).
-            // Внутри неё нужная функция PrintRoots будет выбрана за счёт перегрузки функций.
-            PrintNode(value, strm);
-        }, node.GetValue());
-
-    out << strm.str();
-    return out;
-}
-
 void Print(const Document &doc, std::ostream &output) {
     (void)&doc;
     (void)&output;
     PrintNode(doc.GetRoot(), output);
     // Реализуйте функцию самостоятельно
+}
+
+bool operator==(const json::Node &node1,const json::Node& node2) {
+    return (node1.AsInt() == node2.AsInt() ||
+    node1.AsBool() == node2.AsBool() ||
+    node1.AsDouble() == node2.AsDouble() ||
+    node1.AsString() == node2.AsString() ||
+    node1.AsArray() == node2.AsArray() ||
+    node1.AsMap() == node2.AsMap()) &&
+    (node1.IsInt() == node2.IsInt() ||
+    node1.IsBool() == node2.IsBool() ||
+    node1.IsDouble() == node2.IsDouble() ||
+    node1.IsString() == node2.IsString() ||
+    node1.IsArray() == node2.IsArray() ||
+    node1.IsMap() == node2.IsMap());
+}
+
+bool operator!=(const json::Node &node1,const json::Node& node2) {
+    return (node1.AsInt() != node2.AsInt() ||
+    node1.AsBool() != node2.AsBool() ||
+    node1.AsDouble() != node2.AsDouble() ||
+    node1.AsString() != node2.AsString() ||
+    node1.AsArray() != node2.AsArray() ||
+    node1.AsMap() != node2.AsMap()) ||
+    (node1.IsInt() != node2.IsInt() ||
+    node1.IsBool() != node2.IsBool() ||
+    node1.IsDouble() != node2.IsDouble() ||
+    node1.IsString() != node2.IsString() ||
+    node1.IsArray() != node2.IsArray() ||
+    node1.IsMap() != node2.IsMap());
 }
 
 } // namespace json

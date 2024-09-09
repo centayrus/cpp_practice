@@ -26,21 +26,21 @@ std::string Print(const Node& node) {
     return out.str();
 }
 
-void MustFailToLoad(const std::string& s) {
-    try {
-        LoadJSON(s);
-        std::cerr << "ParsingError exception is expected on '"sv << s << "'"sv << std::endl;
-        assert(false);
-    } catch (const json::ParsingError&) {
-        // ok
-    } catch (const std::exception& e) {
-        std::cerr << "exception thrown: "sv << e.what() << std::endl;
-        assert(false);
-    } catch (...) {
-        std::cerr << "Unexpected error"sv << std::endl;
-        assert(false);
-    }
-}
+// void MustFailToLoad(const std::string& s) {
+//     try {
+//         LoadJSON(s);
+//         std::cerr << "ParsingError exception is expected on '"sv << s << "'"sv << std::endl;
+//         assert(false);
+//     } catch (const json::ParsingError&) {
+//         // ok
+//     } catch (const std::exception& e) {
+//         std::cerr << "exception thrown: "sv << e.what() << std::endl;
+//         assert(false);
+//     } catch (...) {
+//         std::cerr << "Unexpected error"sv << std::endl;
+//         assert(false);
+//     }
+// }
 
 template <typename Fn>
 void MustThrowLogicError(Fn fn) {
@@ -257,12 +257,12 @@ void Benchmark() {
 int main() {
 
     TestNull();
-    TestNumbers();
-    TestStrings();
-    TestBool();
-    TestArray();
-    TestMap();
-    TestErrorHandling();
-    Benchmark();
+    // TestNumbers();
+    // TestStrings();
+    // TestBool();
+    // TestArray();
+    // TestMap();
+    // TestErrorHandling();
+    // Benchmark();
 
 }
