@@ -22,18 +22,20 @@ public:
     using runtime_error::runtime_error;
 };
 
+
 class Node {
 public:
     using Value = std::variant<std::nullptr_t, int, double, std::string, bool, Array, Dict>;
     /* Реализуйте Node, используя std::variant */
 
-    explicit Node();
-    explicit Node(int value);
-    explicit Node(bool is_yn);
-    explicit Node(double value);
-    explicit Node(std::string value);
-    explicit Node(Array array);
-    explicit Node(Dict map);
+    Node();
+    Node(std::nullptr_t);
+    Node(int value);
+    Node(bool is_yn);
+    Node(double value);
+    Node(std::string value);
+    Node(Array array);
+    Node(Dict map);
 
     int AsInt() const;
     bool AsBool() const;
@@ -58,54 +60,6 @@ private:
     Value value_;
 };
 
-
-
-// Шаблон, подходящий для вывода double и int
-template <typename Value>
-void PrintValue(const Value &value, std::ostream &out) {
-    out << value;
-}
-
-// Перегрузка функции PrintValue для вывода значений null
-void PrintValue(std::nullptr_t, std::ostream &out) {
-    out << "null"sv;
-}
-
-// Перегрузка функции PrintValue для вывода Array
-void PrintValue(Array array, std::ostream &out) {
-    bool is_first = true;
-    for (const auto &item : array) {
-        if (!is_first) {
-            out << ",";
-        }
-        out << PrintValue(item.GetValue(), out);;
-        is_first = false;
-    }
-}
-
-void PrintValue(Dict dict, std::ostream &out) {
-    bool is_first = true;
-    for (const auto &item : dict) {
-        if (!is_first) {
-            out << ",";
-        }
-        out << item.first << ": " << PrintValue(item.second.GetValue(), out);
-        is_first = false;
-    }
-}
-
-void PrintValue(bool b, std::ostream &out) {
-    out << std::boolalpha << b;
-}
-
-void PrintNode(const Node &node, std::ostream &out) {
-    std::ostringstream strm;
-    std::visit(
-        [&strm](const auto &value) { PrintValue(value, strm); },
-        node.GetValue());
-        out << strm.str();
-}
-
 class Document {
 public:
     explicit Document(Node root);
@@ -118,10 +72,51 @@ private:
 
 Document Load(std::istream &input);
 
-void Print(const Document &doc, std::ostream &output);
+// Контекст вывода, хранит ссылку на поток вывода и текущий отсуп
+struct PrintContext {
+    std::ostream& out;
+    int indent_step = 4;
+    int indent = 0;
 
-bool operator==(const json::Node &node1, const json::Node& node2);
+    void PrintIndent() const;
 
-bool operator!=(const json::Node &node1, const json::Node& node2);
+    // Возвращает новый контекст вывода с увеличенным смещением
+    PrintContext Indented() const {
+        return {out, indent_step, indent_step + indent};
+    }
+};
+
+void Print(const Document &doc, std::ostream &out);
+
+void PrintNode(const Node &node, const PrintContext& ctx);
+
+inline void PrintValue(const std::string &str, const PrintContext& ctx);
+
+// Шаблон, подходящий для вывода double и int
+// Поскольку функция шаблонная, она остается в h-файле
+template <typename Value>
+void PrintValue(const Value &value, const PrintContext& ctx) {
+    out << value;
+}
+
+// Если оставлять определение функций в заголовочном файле
+// нужно объявить их как inline
+void PrintValue(std::nullptr_t, const PrintContext& ctx);
+
+void PrintValue(Array array, const PrintContext& ctx);
+
+void PrintValue(Dict dict, const PrintContext& ctx);
+
+void PrintValue(bool b, const PrintContext& ctx);
+
+void PrintNode(const Node &node, std::ostream &out);
+
+bool operator==(const json::Node &node1, const json::Node &node2);
+
+bool operator!=(const json::Node &node1, const json::Node &node2);
+
+bool operator==(const json::Document &doc1, const json::Document &doc2);
+
+bool operator!=(const json::Document &doc1, const json::Document &doc2);
 
 } // namespace json

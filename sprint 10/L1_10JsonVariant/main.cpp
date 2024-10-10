@@ -14,11 +14,10 @@ namespace {
 // Можете воспользоваться ими, чтобы протестировать свой код.
 // Раскомментируйте их по мере работы.
 
-
 json::Document LoadJSON(const std::string& s) {
     std::istringstream strm(s);
     return json::Load(strm);
-}
+} 
 
 std::string Print(const Node& node) {
     std::ostringstream out;
@@ -26,21 +25,22 @@ std::string Print(const Node& node) {
     return out.str();
 }
 
-// void MustFailToLoad(const std::string& s) {
-//     try {
-//         LoadJSON(s);
-//         std::cerr << "ParsingError exception is expected on '"sv << s << "'"sv << std::endl;
-//         assert(false);
-//     } catch (const json::ParsingError&) {
-//         // ok
-//     } catch (const std::exception& e) {
-//         std::cerr << "exception thrown: "sv << e.what() << std::endl;
-//         assert(false);
-//     } catch (...) {
-//         std::cerr << "Unexpected error"sv << std::endl;
-//         assert(false);
-//     }
-// }
+    void MustFailToLoad(const std::string& s) {
+    try {
+        LoadJSON(s);
+        std::cerr << "ParsingError exception is expected on '"sv << s << "'"sv << std::endl;
+        assert(false);
+    } catch (const json::ParsingError& e) {
+        // ok
+      // std::cerr << "ParsingError thrown: \"" << s << "\" - " << e.what() << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << "exception thrown: "sv << e.what() << std::endl;
+        assert(false);
+    } catch (...) {
+        std::cerr << "Unexpected error"sv << std::endl;
+        assert(false);
+    }
+}  
 
 template <typename Fn>
 void MustThrowLogicError(Fn fn) {
@@ -48,8 +48,9 @@ void MustThrowLogicError(Fn fn) {
         fn();
         std::cerr << "logic_error is expected"sv << std::endl;
         assert(false);
-    } catch (const std::logic_error&) {
+    } catch (const std::logic_error& e) {
         // ok
+        //std::cerr << "Catch logic error: " << e.what() << '\n';
     } catch (const std::exception& e) {
         std::cerr << "exception thrown: "sv << e.what() << std::endl;
         assert(false);
@@ -59,7 +60,8 @@ void MustThrowLogicError(Fn fn) {
     }
 }
 
-void TestNull() {
+
+ void TestNull() {
     Node null_node;
     assert(null_node.IsNull());
     assert(!null_node.IsInt());
@@ -82,7 +84,7 @@ void TestNull() {
     // Пробелы, табуляции и символы перевода строки между токенами JSON файла игнорируются
     assert(LoadJSON(" \t\r\n\n\r null \t\r\n\n\r "s).GetRoot() == null_node);
 }
-/*
+
 void TestNumbers() {
     const Node int_node{42};
     assert(int_node.IsInt());
@@ -158,10 +160,12 @@ void TestBool() {
     assert(LoadJSON(" \t\r\n\n\r false \t\r\n\n\r "s).GetRoot() == false_node);
 }
 
+
 void TestArray() {
     Node arr_node{Array{1, 1.23, "Hello"s}};
     assert(arr_node.IsArray());
     const Array& arr = arr_node.AsArray();
+
     assert(arr.size() == 3);
     assert(arr.at(0).AsInt() == 1);
 
@@ -170,8 +174,8 @@ void TestArray() {
     assert(LoadJSON(R"(  [ 1  ,  1.23,  "Hello"   ]   )"s).GetRoot() == arr_node);
     // Пробелы, табуляции и символы перевода строки между токенами JSON файла игнорируются
     assert(LoadJSON("[ 1 \r \n ,  \r\n\t 1.23, \n \n  \t\t  \"Hello\" \t \n  ] \n  "s).GetRoot()
-           == arr_node);
-}
+           == arr_node); 
+} 
 
 void TestMap() {
     Node dict_node{Dict{{"key1"s, "value1"s}, {"key2"s, 42}}};
@@ -182,6 +186,8 @@ void TestMap() {
     assert(dict.at("key2"s).AsInt() == 42);
 
     assert(LoadJSON("{ \"key1\": \"value1\", \"key2\": 42 }"s).GetRoot() == dict_node);
+    auto dict_print = Print(dict_node);
+    auto dict_node2 = LoadJSON(Print(dict_node)).GetRoot();
     assert(LoadJSON(Print(dict_node)).GetRoot() == dict_node);
     // Пробелы, табуляции и символы перевода строки между токенами JSON файла игнорируются
     assert(
@@ -191,47 +197,46 @@ void TestMap() {
         == dict_node);
 }
 
-void TestErrorHandling() {
-    MustFailToLoad("["s);
-    MustFailToLoad("]"s);
+    void TestErrorHandling() {
+      MustFailToLoad("["s);
+       MustFailToLoad("]"s);
 
-    MustFailToLoad("{"s);
-    MustFailToLoad("}"s);
+       MustFailToLoad("{"s);
+       MustFailToLoad("}"s);
 
-    MustFailToLoad("\"hello"s);  // незакрытая кавычка
+     MustFailToLoad("\"hello"s);  // незакрытая кавычка
 
-    MustFailToLoad("tru"s);
-    MustFailToLoad("fals"s);
-    MustFailToLoad("nul"s);
+       MustFailToLoad("tru"s);
+       MustFailToLoad("fals"s);
+       MustFailToLoad("nul"s);
 
-    Node dbl_node{3.5};
+     Node dbl_node{3.5};
+     MustThrowLogicError([&dbl_node] {
+         dbl_node.AsInt();
+     });
+     MustThrowLogicError([&dbl_node] {
+         dbl_node.AsString();
+     });
     MustThrowLogicError([&dbl_node] {
-        dbl_node.AsInt();
-    });
-    MustThrowLogicError([&dbl_node] {
-        dbl_node.AsString();
-    });
-    MustThrowLogicError([&dbl_node] {
-        dbl_node.AsArray();
-    });
+        dbl_node.AsArray();     });
 
-    Node array_node{Array{}};
-    MustThrowLogicError([&array_node] {
-        array_node.AsMap();
-    });
+     Node array_node{Array{}};
+     MustThrowLogicError([&array_node] {
+         array_node.AsMap();
+     });
     MustThrowLogicError([&array_node] {
         array_node.AsDouble();
     });
     MustThrowLogicError([&array_node] {
         array_node.AsBool();
     });
-}
+   }
 
 void Benchmark() {
     const auto start = std::chrono::steady_clock::now();
     Array arr;
-    arr.reserve(1'000);
-    for (int i = 0; i < 1'000; ++i) {
+    arr.reserve(10000);
+    for (int i = 0; i < 10000; ++i) {
         arr.emplace_back(Dict{
             {"int"s, 42},
             {"double"s, 42.1},
@@ -249,20 +254,18 @@ void Benchmark() {
     const auto duration = std::chrono::steady_clock::now() - start;
     std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() << "ms"sv
               << std::endl;
-}
-*/
+} 
+
 
 }  // namespace
 
 int main() {
-
     TestNull();
-    // TestNumbers();
-    // TestStrings();
-    // TestBool();
-    // TestArray();
-    // TestMap();
-    // TestErrorHandling();
-    // Benchmark();
-
+   TestNumbers();
+   TestStrings();
+     TestBool();
+     TestArray();
+    TestMap();
+    TestErrorHandling();
+     Benchmark();
 }
