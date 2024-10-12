@@ -16,7 +16,7 @@ Node LoadArray(istream &input) {
             input.putback(c);
         }
         result.push_back(LoadNode(input));
-    } 
+    }
     if (c != ']') {
         throw ParsingError("Failed to read Array from stream"s);
     }
@@ -164,17 +164,17 @@ Node LoadDict(istream &input) {
         input >> c;
         result.insert({move(key), LoadNode(input)});
     }
-        if (c != '}') {
+    if (c != '}') {
         throw ParsingError("Failed to read Dict from stream"s);
     }
     return Node(move(result));
 }
 
 Node LoadNullOrBool(istream &input) {
-    //char tmp_c;
+    // char tmp_c;
     std::string tmp_str, clean_str;
     for (char c; input >> c;) {
-        if (c == ']' || c == '}' || c == ',' ) {
+        if (c == ']' || c == '}' || c == ',') {
             input.putback(c);
             break;
         }
@@ -350,85 +350,92 @@ Document Load(istream &input) {
 }
 
 // Контекст вывода, хранит ссылку на поток вывода и текущий отсуп
-PrintContext::PrintIndent() const {
-        for (int i = 0; i < indent; ++i) {
-            out.put(' ');
-        }
+void PrintContext::PrintIndent() const {
+    for (int i = 0; i < indent; ++i) {
+        out.put(' ');
     }
+}
 
-    // Возвращает новый контекст вывода с увеличенным смещением
 PrintContext PrintContext::Indented() const {
     return {out, indent_step, indent_step + indent};
 }
 
-void Print(const Document &doc, std::ostream &out) {
+void Print(const Document &doc, std::ostream &output) {
     (void)&doc;
     (void)&output;
-    PrintContext ctx;
-    ctx.out = 
-    PrintNode(doc.GetRoot(), output);
+    PrintContext ctx(output, 4, 0);
+    PrintNode(doc.GetRoot(), ctx);
 }
 
-void PrintValue(const std::string &str, const PrintContext& ctx) {
-    out << "\"";
+void PrintValue(const std::string &str, const PrintContext &ctx) {
+    ctx.out << "\"";
     for (const auto &c : str) {
         if (c == '\\') {
-            out << "\\\\"s;
+            ctx.out << "\\\\"s;
         } else if (c == '\"') {
-            out << "\\\""s;
+            ctx.out << "\\\""s;
         } else if (c == '\r') {
-            out << "\\r"s;
+            ctx.out << "\\r"s;
         } else if (c == '\n') {
-            out << "\\n"s;
+            ctx.out << "\\n"s;
         } else if (c == '\t') {
-            out << "\\t"s;
+            ctx.out << "\\t"s;
         } else {
-            out << c;
+            ctx.out << c;
         }
     }
-    out << "\"";
+    ctx.out << "\"";
 }
 
-void PrintValue(std::nullptr_t, const PrintContext& ctx) {
-    out << "null"sv;
+void PrintValue(std::nullptr_t, const PrintContext &ctx) {
+    ctx.out << "null"s;
 }
 
-void PrintValue(Array array, const PrintContext& ctx) {
+void PrintValue(Array array, const PrintContext &ctx) {
+    auto ctx_a = ctx.Indented();
     bool is_first = true;
-    out << "["s;
+    ctx.out << "["s << '\n';
     for (const auto &item : array) {
         if (!is_first) {
-            out << ",";
+            ctx.out << "," << '\n';
         }
-        PrintNode(item, out);
+        ctx_a.PrintIndent();
+        PrintNode(item, ctx_a);
         is_first = false;
     }
-    out << "]"s;
+    ctx.out << '\n';
+    ctx.PrintIndent();
+    ctx.out << "]"s;
 }
 
-void PrintValue(Dict dict, const PrintContext& ctx) {
+void PrintValue(Dict dict, const PrintContext &ctx) {
+    auto ctx_a = ctx.Indented();
     bool is_first = true;
     std::string tmp_str;
-    out << "{"s;
+    ctx.out << "{"s;
     for (const auto &item : dict) {
         if (!is_first) {
-            out << ","s;
+            ctx.out << ","s;
         }
-        out << "\""s;
-        out << item.first << "\":"s;
-        PrintNode(item.second, out);
+        ctx.out << '\n';
+        ctx_a.PrintIndent();
+        ctx.out << "\""s;
+        ctx.out << item.first << "\": "s;
+        PrintNode(item.second, ctx_a);
         is_first = false;
     }
-    out << "}"s;
+    ctx.out << '\n';
+    ctx.PrintIndent();
+    ctx.out << "}"s;
 }
 
-void PrintValue(bool b, const PrintContext& ctx) {
-    out << std::boolalpha << b;
+void PrintValue(bool b, const PrintContext &ctx) {
+    ctx.out << std::boolalpha << b;
 }
 
-void PrintNode(const Node &node, const PrintContext& ctx) {
+void PrintNode(const Node &node, const PrintContext &ctx) {
     std::visit(
-        [&out](const auto &value) { PrintValue(value, ); },
+        [&ctx](const auto &value) { PrintValue(value, ctx); },
         node.GetValue());
 }
 

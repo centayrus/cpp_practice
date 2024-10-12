@@ -73,7 +73,8 @@ private:
 Document Load(std::istream &input);
 
 // Контекст вывода, хранит ссылку на поток вывода и текущий отсуп
-struct PrintContext {
+ struct PrintContext {
+    PrintContext(std::ostream& output, int step, int ind) : out(output), indent_step(step), indent(ind) {}
     std::ostream& out;
     int indent_step = 4;
     int indent = 0;
@@ -81,10 +82,8 @@ struct PrintContext {
     void PrintIndent() const;
 
     // Возвращает новый контекст вывода с увеличенным смещением
-    PrintContext Indented() const {
-        return {out, indent_step, indent_step + indent};
-    }
-};
+    PrintContext Indented() const;
+}; 
 
 void Print(const Document &doc, std::ostream &out);
 
@@ -96,7 +95,8 @@ inline void PrintValue(const std::string &str, const PrintContext& ctx);
 // Поскольку функция шаблонная, она остается в h-файле
 template <typename Value>
 void PrintValue(const Value &value, const PrintContext& ctx) {
-    out << value;
+    //ctx.PrintIndent();
+    ctx.out << value;
 }
 
 // Если оставлять определение функций в заголовочном файле

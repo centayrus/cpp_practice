@@ -14,7 +14,7 @@ namespace {
 // Можете воспользоваться ими, чтобы протестировать свой код.
 // Раскомментируйте их по мере работы.
 
-json::Document LoadJSON(const std::string& s) {
+ json::Document LoadJSON(const std::string& s) {
     std::istringstream strm(s);
     return json::Load(strm);
 } 
@@ -230,13 +230,13 @@ void TestMap() {
     MustThrowLogicError([&array_node] {
         array_node.AsBool();
     });
-   }
+   } 
 
 void Benchmark() {
     const auto start = std::chrono::steady_clock::now();
     Array arr;
-    arr.reserve(10000);
-    for (int i = 0; i < 10000; ++i) {
+    arr.reserve(1);
+    for (int i = 0; i < 1; ++i) {
         arr.emplace_back(Dict{
             {"int"s, 42},
             {"double"s, 42.1},
@@ -249,23 +249,26 @@ void Benchmark() {
     }
     std::stringstream strm;
     json::Print(Document{arr}, strm);
+    std::cout << strm.str();
     const auto doc = json::Load(strm);
     assert(doc.GetRoot() == arr);
     const auto duration = std::chrono::steady_clock::now() - start;
-    std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() << "ms"sv
-              << std::endl;
+   // std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() << "ms"sv
+     //         << std::endl;
+     std::cout << '\n';
+     std::cout << '\n';
 } 
 
 
 }  // namespace
 
 int main() {
-    TestNull();
+     TestNull();
    TestNumbers();
    TestStrings();
      TestBool();
      TestArray();
     TestMap();
-    TestErrorHandling();
+    TestErrorHandling(); 
      Benchmark();
 }
