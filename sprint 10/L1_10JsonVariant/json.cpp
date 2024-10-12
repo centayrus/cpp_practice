@@ -387,11 +387,11 @@ void PrintValue(const std::string &str, const PrintContext &ctx) {
     ctx.out << "\"";
 }
 
-void PrintValue(std::nullptr_t, const PrintContext &ctx) {
+void PrintValue(const std::nullptr_t&, const PrintContext &ctx) {
     ctx.out << "null"s;
 }
 
-void PrintValue(Array array, const PrintContext &ctx) {
+void PrintValue(const Array& array, const PrintContext &ctx) {
     auto ctx_a = ctx.Indented();
     bool is_first = true;
     ctx.out << "["s << '\n';
@@ -408,7 +408,7 @@ void PrintValue(Array array, const PrintContext &ctx) {
     ctx.out << "]"s;
 }
 
-void PrintValue(Dict dict, const PrintContext &ctx) {
+void PrintValue(const Dict& dict, const PrintContext &ctx) {
     auto ctx_a = ctx.Indented();
     bool is_first = true;
     std::string tmp_str;
@@ -429,7 +429,7 @@ void PrintValue(Dict dict, const PrintContext &ctx) {
     ctx.out << "}"s;
 }
 
-void PrintValue(bool b, const PrintContext &ctx) {
+void PrintValue(const bool& b, const PrintContext &ctx) {
     ctx.out << std::boolalpha << b;
 }
 

@@ -95,19 +95,18 @@ inline void PrintValue(const std::string &str, const PrintContext& ctx);
 // Поскольку функция шаблонная, она остается в h-файле
 template <typename Value>
 void PrintValue(const Value &value, const PrintContext& ctx) {
-    //ctx.PrintIndent();
     ctx.out << value;
 }
 
 // Если оставлять определение функций в заголовочном файле
 // нужно объявить их как inline
-void PrintValue(std::nullptr_t, const PrintContext& ctx);
+void PrintValue(const std::nullptr_t&, const PrintContext& ctx);
 
-void PrintValue(Array array, const PrintContext& ctx);
+void PrintValue(const Array& array, const PrintContext& ctx);
 
-void PrintValue(Dict dict, const PrintContext& ctx);
+void PrintValue(const Dict& dict, const PrintContext& ctx);
 
-void PrintValue(bool b, const PrintContext& ctx);
+void PrintValue(const bool& b, const PrintContext& ctx);
 
 void PrintNode(const Node &node, std::ostream &out);
 

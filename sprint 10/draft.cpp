@@ -1,41 +1,50 @@
 #include <iostream>
+#include <string>
+#include <vector>
 
-enum class Color { Red, Green, Blue };
-enum class Shape { Circle, Square, Triangle };
+using namespace std;
 
-std::ostream& operator<<(std::ostream& os, const Color& color) {
-    switch (color) {
-        case Color::Red:
-            os << "Красный";
-            break;
-        case Color::Green:
-            os << "Зеленый";
-            break;
-        case Color::Blue:
-            os << "Синий";
-            break;
+class Animal {
+public:
+    virtual ~Animal() = default;
+
+protected:
+    int health_ = 10;
+};
+
+class Mouse : public Animal {
+public:
+    void EatCheese() {
+        health_ += 10;
     }
-    return os;
-}
+};
 
-std::ostream& operator<<(std::ostream& os, const Shape& shape) {
-    switch (shape) {
-        case Shape::Circle:
-            os << "Круг";
-            break;
-        case Shape::Square:
-            os << "Квадрат";
-            break;
-        case Shape::Triangle:
-            os << "Треугольник";
-            break;
+class Hedgehog : public Animal {
+public:
+    void Sing(string song) {
+        sing_history_.push_back(move(song));
     }
-    return os;
+
+private:
+    vector<string> sing_history_;
+};
+
+
+void PlayWithAnimal(Animal& animal) {
+    Mouse& mouse = dynamic_cast<Mouse&>(animal);
+    cout << "Mouse eats cheese"sv << endl;
+    mouse.EatCheese();
+
+    Hedgehog& hedgehog = dynamic_cast<Hedgehog*>(animal);
+    cout << "Hedgehog sings songs"sv << endl;
+    hedgehog.Sing("Jingle Bells"s);
+    hedgehog.Sing("Yesterday"s);
 }
 
 int main() {
-    Color myColor = Color::Green;
-    Shape myShape = Shape::Circle;
-    std::cout << "Мой цвет: " << myColor << ", моя форма: " << myShape << std::endl;
-    return 0;
+    Mouse mouse;
+    PlayWithAnimal(mouse);
+    cout << "---"sv << endl;
+    Hedgehog hedgehog;
+    PlayWithAnimal(hedgehog);
 }
