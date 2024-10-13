@@ -5,7 +5,7 @@
 #include <utility>
 
 // Добавление остановки в базу
-void TransportCatalogue::AddStop(const std::string &stop_name, const Coordinates &coordinate) {
+void TransportCatalogue::AddStop(const std::string &stop_name, const geo::Coordinates &coordinate) {
     stops_list_.push_back({stop_name, coordinate});
     auto stop_ptr = &stops_list_.back();
     stopname_to_stop_[stops_list_.back().name] = stop_ptr;
@@ -32,17 +32,7 @@ void TransportCatalogue::AddBus(const std::string &bus_name, const std::vector<s
     }
 }
 
-double TransportCatalogue::GetDistance(const Stop *prev_stop, const Stop *cur_stop) const {
-    std::pair<const Stop *, const Stop *> key = std::make_pair(prev_stop, cur_stop);
-    auto value = stop_to_stop_dist_.find(key);
-    if (value == stop_to_stop_dist_.end()) {
-        key = std::make_pair(cur_stop, prev_stop);
-        value = stop_to_stop_dist_.find(key);
-    }
-    return value->second;
-}
-
-// Поиск маршрута
+// Статистика маршрута
 BusStat TransportCatalogue::ReportBusStatistic(std::string_view request) const {
     auto bus_pos = busname_to_bus_.find(request);
     if (bus_pos == busname_to_bus_.end()) {
@@ -63,7 +53,7 @@ BusStat TransportCatalogue::ReportBusStatistic(std::string_view request) const {
     // Рассчет дистанции маршрута
     for (const auto stop : bus.stops) {
         if (!first_cycle) {
-            total_distance += ComputeDistance(prev_location, stop->coordinate);
+            total_distance += geo::ComputeDistance(prev_location, stop->coordinate);
             route_distance += GetDistance(std::move(prev_stop), std::move(stop));
         }
         first_cycle = false;
@@ -73,6 +63,7 @@ BusStat TransportCatalogue::ReportBusStatistic(std::string_view request) const {
     return {common_stops_count, uniq_stops_count, route_distance, route_distance / total_distance};
 }
 
+// Информация по остановке
 StopStat TransportCatalogue::ReportStopStatistic(std::string_view stopname) const {
     std::string_view stop;
     if (stopname_to_stop_.count(stopname)) {
@@ -90,6 +81,16 @@ StopStat TransportCatalogue::ReportStopStatistic(std::string_view stopname) cons
                                             (*rhs).bus_route.begin(), (*rhs).bus_route.end());
     });
     return {stop, v_stop_stat};
+}
+
+double TransportCatalogue::GetDistance(const Stop *prev_stop, const Stop *cur_stop) const {
+    std::pair<const Stop *, const Stop *> key = std::make_pair(prev_stop, cur_stop);
+    auto value = stop_to_stop_dist_.find(key);
+    if (value == stop_to_stop_dist_.end()) {
+        key = std::make_pair(cur_stop, prev_stop);
+        value = stop_to_stop_dist_.find(key);
+    }
+    return value->second;
 }
 
 void TransportCatalogue::SetDistance(const std::string_view a_name, const std::string_view b_name, const double &dist) {

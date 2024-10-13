@@ -1,5 +1,4 @@
 #include "input_reader.h"
-#include "log_duration.h"
 
 #include <algorithm>
 #include <cassert>
@@ -167,35 +166,20 @@ void InputReader::ApplyCommands([[maybe_unused]] TransportCatalogue &catalogue) 
         return lhs.command > rhs.command;
     });
     // Обработка запросов согласно очередности
-    {
-        LOG_DURATION("ParseCoordinates");
-        for (const CommandDescription &command : query_queue) {
-            if (Trim(command.command) == "Stop") {
-                Coordinates c = ParseCoordinates(std::move(command.description)); // убрать мув
-                catalogue.AddStop(command.id, std::move(c));
-            } else {
-                catalogue.AddBus(command.id, ParseRoute(std::move(command.description)));
-            }
+    for (const CommandDescription &command : query_queue) {
+        if (Trim(command.command) == "Stop") {
+            Coordinates c = ParseCoordinates(std::move(command.description));
+            catalogue.AddStop(command.id, std::move(c));
+        } else {
+            catalogue.AddBus(command.id, ParseRoute(std::move(command.description)));
         }
     }
-    {
-        LOG_DURATION("ParseDistances");
-        for (const CommandDescription &command : query_queue) {
-            //   distances distance;
-              if (command.command == "Stop") {
+    for (const CommandDescription &command : query_queue) {
+        if (command.command == "Stop") {
             distances distance = ParseDistances(command.description);
-            catalogue.SetDistance(command.id, distance);
-              }
-            //  }
-            // }
-            //{
-            //  LOG_DURATION("SetDistance");
-            // for (const CommandDescription &command : query_queue) {
-            //    distances distance;
-            //    if (command.command == "Stop") {
-            //  distance = ParseDistances(command.description);
-            // catalogue.SetDistance(command.id, {{"cdbsoind", 9500}});
-            //    }
+            for (const auto &nearby_stop : distance) {
+                catalogue.SetDistance(command.id, nearby_stop.first, nearby_stop.second);
+            }
         }
     }
 }

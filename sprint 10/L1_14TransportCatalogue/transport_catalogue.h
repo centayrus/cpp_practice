@@ -33,7 +33,7 @@ private:
 
 struct Stop {
     std::string name;
-    Coordinates coordinate;
+    geo::Coordinates coordinate;
     // std::unordered_map<std::pair<const Stop *, const Stop *>, double, StopDistanceHasher> distance;
 };
 
@@ -71,14 +71,12 @@ struct StopStat {
 class TransportCatalogue {
 
 public:
-    void AddStop(const std::string &name, const Coordinates &coordinate);
+    void AddStop(const std::string &name, const geo::Coordinates &coordinate);
 
     void AddBus(const std::string &bus_name, const std::vector<std::string_view> &route);
 
-    // от optional смысла не вижу, т.к. в PrintBusStat и так проверяется существование bus_stat
     BusStat ReportBusStatistic(std::string_view request) const;
 
-    // аналогично проверяется существование stop_stat
     StopStat ReportStopStatistic(std::string_view stopname) const;
 
     void SetDistance(const std::string_view a_name, const std::string_view b_name, const double &dist);
