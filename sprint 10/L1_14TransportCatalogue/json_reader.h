@@ -1,8 +1,9 @@
 #pragma once
+#include <string>
 
-#include <json.h>
-#include <request_handler.h>
-#include <transport_catalogue.h>
+#include "json.h"
+#include "request_handler.h"
+#include "transport_catalogue.h"
 
 /*
  * Здесь можно разместить код наполнения транспортного справочника данными из JSON,
@@ -13,21 +14,24 @@
 
 class JsonReader {
 public:
-    JsonReader(Document doc) : json_document_(doc) {}
+   explicit JsonReader();
+   explicit JsonReader(json::Document doc);
 
 // Загрузка сырых данных в json-документ
-    Document LoadJson(const std::string &s);
+    json::Document LoadJson(const std::string &s);
 
 // Загрузка данных в справочник
-    void LoadCatalogue(const TransportCatalogue& db) const;
+    void LoadCatalogue(TransportCatalogue& db);
 
-    Document GetReqsResults(const RequestHandler &req_handler, std::ostream &output) const
+    json::Document GetReqsResults(const RequestHandler &req_handler) const;
+
+    void PrintStatistics(const json::Document &doc, std::ostream &ostrm) const;
 
 private:
-    Document json_document_;
+    json::Document json_document_;
 
-void BusStatLoad(Document& result_doc, const BusStat bus_stat) const;
+json::Node BusStatLoad(/* json::Document& result_doc, */ const std::optional<BusStat> bus_stat, const int req_id) const;
 
-void StopStatLoad(Document& result_doc, const StopStat stop_stat) const;
+json::Node StopStatLoad(/* json::Document& result_doc, */ const std::optional<StopStat> stop_stat, const int req_id) const;
 
 };
