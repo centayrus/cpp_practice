@@ -98,3 +98,8 @@ void TransportCatalogue::SetDistance(const std::string_view a_name, const std::s
     auto b_stop_ptr = stopname_to_stop_.find(b_name)->second;
     stop_to_stop_dist_[{a_stop_ptr, b_stop_ptr}] = dist;
 }
+
+
+std::deque<Bus> &TransportCatalogue::GetAllRoutes() const {
+    return bus_routes_;
+}

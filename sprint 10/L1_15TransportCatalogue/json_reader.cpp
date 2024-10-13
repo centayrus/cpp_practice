@@ -95,7 +95,7 @@ json::Node StopStatLoad(const StopStat stop_stat, const int req_id) {
         json_str += "{\"buses\": [";
         bool is_first = true;
         for (const auto *bus : stop_stat.bus_routes) {
-            
+
             if (!is_first) {
                 json_str += ",";
             }
@@ -111,4 +111,20 @@ json::Node StopStatLoad(const StopStat stop_stat, const int req_id) {
     std::istringstream strm(json_str);
     json::Document doc_item = json::Load(strm);
     return doc_item.GetRoot();
+}
+
+void FillRenderSets(const json::Node &render_node, RenderSets &render_sets) {
+    json::Dict attrs = render_node.AsMap();
+    render_sets.width = attrs.at("width").AsDouble();
+    render_sets.height = attrs.at("height").AsDouble();
+    render_sets.padding = attrs.at("padding").AsDouble();
+    render_sets.line_width = attrs.at("line_width").AsDouble();
+    render_sets.stop_radius = attrs.at("stop_radius").AsDouble();
+    render_sets.bus_label_font_size = attrs.at("bus_label_font_size").AsInt();
+    render_sets.bus_label_offset = svg::Point(attrs.at("bus_label_offset").AsArray()[0], attrs.at("bus_label_offset").AsArray()[1]);
+    render_sets.stop_label_font_size = attrs.at("stop_label_font_size").AsInt();
+    render_sets.stop_label_offset = svg::Point(attrs.at("stop_label_offset").AsArray()[0], attrs.at("stop_label_offset").AsArray()[1]);
+    render_sets.underlayer_color = svg::Rgba(attrs.at("underlayer_color").AsArray()[0] attrs.at("underlayer_color").AsArray()[1] attrs.at("underlayer_color").AsArray()[2] attrs.at("underlayer_color").AsArray()[3]);
+    render_sets.underlayer_width = attrs.at("underlayer_width").AsDouble();
+    render_sets.color_palette = attrs.at("color_palette").AsArray();
 }

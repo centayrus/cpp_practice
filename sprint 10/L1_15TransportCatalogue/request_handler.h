@@ -13,6 +13,8 @@ public:
     // Возвращает маршруты, проходящие через
     StopStat GetBusesByStop(const std::string_view& stop_name) const;
 
+    std::deque<Bus> GetAllBusRoutes() const;
+
 private:
     // RequestHandler использует агрегацию объектов "Транспортный Справочник" и "Визуализатор Карты"
     const TransportCatalogue& db_;

@@ -9,3 +9,8 @@ BusStat RequestHandler::GetBusStat(const std::string_view &bus_name) const {
 StopStat RequestHandler::GetBusesByStop(const std::string_view &stop_name) const {
    return db_.ReportStopStatistic(stop_name);
 }
+
+std::deque<Bus> &RequestHandler::GetAllBusRoutes() const {
+    return db_.GetAllRoutes();
+}
+
