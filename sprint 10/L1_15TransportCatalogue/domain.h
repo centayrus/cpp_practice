@@ -7,6 +7,8 @@
 
 #include "geo.h"
 
+namespace domain {
+
 struct Stop;
 
 class StopDistanceHasher {
@@ -53,3 +55,4 @@ struct StopStat {
     std::string_view name;
     std::vector<const Bus *> bus_routes;
 };
+} // namespace domain

@@ -100,6 +100,10 @@ void TransportCatalogue::SetDistance(const std::string_view a_name, const std::s
 }
 
 
-std::deque<Bus> &TransportCatalogue::GetAllRoutes() const {
-    return bus_routes_;
+    const std::unordered_map<std::string_view, Bus *> &TransportCatalogue::GetAllRoutes() const {
+    return busname_to_bus_;
+}
+
+const std::deque<Stop> &GetUniqueStops() const {
+    return stops_list_;
 }

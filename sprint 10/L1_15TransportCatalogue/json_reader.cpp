@@ -121,10 +121,61 @@ void FillRenderSets(const json::Node &render_node, RenderSets &render_sets) {
     render_sets.line_width = attrs.at("line_width").AsDouble();
     render_sets.stop_radius = attrs.at("stop_radius").AsDouble();
     render_sets.bus_label_font_size = attrs.at("bus_label_font_size").AsInt();
-    render_sets.bus_label_offset = svg::Point(attrs.at("bus_label_offset").AsArray()[0], attrs.at("bus_label_offset").AsArray()[1]);
+    render_sets.bus_label_offset = svg::Point(attrs.at("bus_label_offset").AsArray()[0].AsDouble(), attrs.at("bus_label_offset").AsArray()[1].AsDouble());
     render_sets.stop_label_font_size = attrs.at("stop_label_font_size").AsInt();
-    render_sets.stop_label_offset = svg::Point(attrs.at("stop_label_offset").AsArray()[0], attrs.at("stop_label_offset").AsArray()[1]);
-    render_sets.underlayer_color = svg::Rgba(attrs.at("underlayer_color").AsArray()[0] attrs.at("underlayer_color").AsArray()[1] attrs.at("underlayer_color").AsArray()[2] attrs.at("underlayer_color").AsArray()[3]);
+    render_sets.stop_label_offset = svg::Point(attrs.at("stop_label_offset").AsArray()[0].AsDouble(), attrs.at("stop_label_offset").AsArray()[1].AsDouble());
+    render_sets.underlayer_color = svg::Rgba(static_cast<uint8_t>(attrs.at("underlayer_color").AsArray()[0].AsInt()),
+                                             static_cast<uint8_t>(attrs.at("underlayer_color").AsArray()[1].AsInt()),
+                                             static_cast<uint8_t>(attrs.at("underlayer_color").AsArray()[2].AsInt()),
+                                             static_cast<uint8_t>(attrs.at("underlayer_color").AsArray()[3].AsDouble()));
     render_sets.underlayer_width = attrs.at("underlayer_width").AsDouble();
-    render_sets.color_palette = attrs.at("color_palette").AsArray();
+    for (const auto &item : attrs.at("color_palette").AsArray()) {
+        if (item.IsString()) {
+            render_sets.color_palette.push_back(item.AsString());
+        } else if (item.IsArray()) {
+            auto rgb = svg::Rgb(static_cast<uint8_t>(item.AsArray()[0].AsInt()),
+                                static_cast<uint8_t>(item.AsArray()[1].AsInt()), static_cast<uint8_t>(item.AsArray()[2].AsInt()));
+            render_sets.color_palette.push_back(rgb);
+        }
+    }
+    if (render_sets.validateRenderSets()) {
+        throw std::invalid_argument("Render set attrs is not valid");
+    }
+}
+
+geo::Coordinates FindMinCoordinates(const std::deque<Stop> &buses) {
+    double min_lat, min_lon;
+    bool is_first = true;
+    for (const auto &bus : buses) {
+        if (is_first) {
+            min_lat = bus.coordinate.lat;
+            min_lon = bus.coordinate.lon;
+            is_first = false;
+        }
+        if (bus.coordinate.lat < min_lat) {
+            min_lat = bus.coordinate.lat;
+        }
+        if (bus.coordinate.lon < min_lon) {
+            min_lon = bus.coordinate.lon;
+        }
+    }
+}
+
+geo::Coordinates FindMaxCoordinates(const std::deque<Stop> &buses) {
+    double min_lat, min_lon, max_lat, max_lon;
+    bool is_first = true;
+    for (const auto &bus : buses) {
+        if (is_first) {
+            max_lat = bus.coordinate.lat;
+            max_lon = bus.coordinate.lon;
+            ;
+            is_first = false;
+        }
+        if (bus.coordinate.lat > max_lat) {
+            max_lat = bus.coordinate.lat;
+        }
+        if (bus.coordinate.lon > max_lon) {
+            max_lon = bus.coordinate.lon;
+        }
+    }
 }

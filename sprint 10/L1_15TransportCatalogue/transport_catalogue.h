@@ -25,7 +25,9 @@ public:
 
     void SetDistance(const std::string_view a_name, const std::string_view b_name, const double &dist);
 
-    std::deque<Bus> &GetAllRoutes() const;
+    const std::unordered_map<std::string_view, Bus*> &GetAllRoutes() const;
+
+    const std::deque<Stop> &GetUniqueStops() const;
 
 private:
     std::deque<Stop> stops_list_;

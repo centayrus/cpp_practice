@@ -7,11 +7,11 @@
 #include <cstdlib>
 #include <iostream>
 #include <optional>
-#include <vector>
 #include <utility>
+#include <vector>
 
 inline const double EPSILON = 1e-6;
-bool IsZero(double value) {
+inline bool IsZero(double value) {
     return std::abs(value) < EPSILON;
 }
 
@@ -82,29 +82,61 @@ private:
 };
 
 struct RenderSets {
-    double width;
-    double height;
-    double padding;
-    double stop_radius;
-    double line_width;
-    int bus_label_font_size;
-    svg::Point bus_label_offset;
-    int stop_label_font_size;
-    svg::Point stop_label_offset;
-    svg::Rgba underlayer_color;
-    double underlayer_width;
-    std::variant<std::string, svg::Rgb> color_palette;
-    
+    double width = 0.;
+    double height = 0.;
+    double padding = 0.;
+    double stop_radius = 0.;
+    double line_width = 0.;
+    int bus_label_font_size = 0;
+    svg::Point bus_label_offset = {0., 0.};
+    int stop_label_font_size = 0;
+    svg::Point stop_label_offset = {0., 0.};
+    svg::Rgba underlayer_color = svg::Rgba(0, 0, 0, 1.0);
+    double underlayer_width = 0.;
+    std::vector<std::variant<std::string, svg::Rgb>> color_palette = {"black"};
+    bool validateRenderSets() const {
+        return validateWidth() && validateHeight() && validatePadding() && validateStopRadius() && validateBusLabelFontSize() && validateBusLabelOffset() && validateStopLabelFontSize() && validateStopLabelOffset() && validateUnderlayerWidth();
+    }
+
+private:
+    bool validateWidth() const {
+        return width >= 0 && width <= 100000;
+    }
+    bool validateHeight() const {
+        return height >= 0 && height <= 100000;
+    }
+    bool validatePadding() const {
+        return padding >= 0 && padding < std::min(width, height) / 2;
+    }
+    bool validateStopRadius() const {
+        return stop_radius >= 0 && stop_radius <= 100000;
+    }
+    bool validateBusLabelFontSize() const {
+        return bus_label_font_size >= 0 && bus_label_font_size <= 100000;
+    }
+    bool validateBusLabelOffset() const {
+        return bus_label_offset.x >= -100000 && bus_label_offset.x <= 100000 && bus_label_offset.y >= -100000 && bus_label_offset.y <= 100000;
+    }
+    bool validateStopLabelFontSize() const {
+        return stop_label_font_size >= 0 && stop_label_font_size <= 100000;
+    }
+    bool validateStopLabelOffset() const {
+        return stop_label_offset.x >= -100000 && stop_label_offset.x <= 100000 && stop_label_offset.y >= -100000 && stop_label_offset.y <= 100000;
+    }
+    bool validateUnderlayerWidth() const {
+        return underlayer_width >= 0 && underlayer_width <= 100000;
+    }
 };
 
-class MapRenderer() {
+class MapRenderer {
 public:
-    MapRenderer(RenderSets rs) : render_sets_(rs) {}
+    MapRenderer() = default;
+    MapRenderer(RenderSets rs);
 
-    MakeBusRender()
-
-    MakeStopRender()
+    RenderSets MakeRender(const svg::Point point, ) const;
 
 private:
     RenderSets render_sets_;
 }
+
+

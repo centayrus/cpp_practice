@@ -17,4 +17,8 @@ void LoadCatalogue(TransportCatalogue &db, const std::vector<json::Node> &base_r
 
 json::Document GetReqsResults(const RequestHandler &req_handler, const std::vector<json::Node> &base_req);
 
-void FillRenderSets(json::Node render_node);
+void FillRenderSets(const json::Node &render_node, RenderSets &render_sets);
+
+geo::Coordinates FindMinCoordinates(const std::deque<Stop> &buses);
+
+geo::Coordinates FindMaxCoordinates(const std::deque<Stop> &buses);

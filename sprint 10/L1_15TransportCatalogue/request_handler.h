@@ -13,9 +13,12 @@ public:
     // Возвращает маршруты, проходящие через
     StopStat GetBusesByStop(const std::string_view& stop_name) const;
 
-    std::deque<Bus> GetAllBusRoutes() const;
+    const std::unordered_map<std::string_view, Bus *> &GetAllBusRoutes() const;
+
+    const std::deque<Stop> &GetUniqueStops() const;
 
 private:
     // RequestHandler использует агрегацию объектов "Транспортный Справочник" и "Визуализатор Карты"
     const TransportCatalogue& db_;
 };
+
