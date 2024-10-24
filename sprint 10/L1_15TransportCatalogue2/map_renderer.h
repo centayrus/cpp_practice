@@ -129,8 +129,9 @@ private:
 };
 
 struct StopToPoint {
-    std::string_view stop;
-    std::vector<svg::Point> point;
+    std::string_view bus;
+    std::vector<std::pair<std::string_view, svg::Point>> point;
+    bool is_roundtrip;
 };
 
 class MapRenderer {
@@ -138,17 +139,30 @@ public:
     MapRenderer() = default;
     MapRenderer(RenderSets rs);
 
-    void FillStopPoints();
+    svg::Polyline MakeRenderPolyline(const StopToPoint &stop_point, const size_t &pallet_num) const;
 
-    svg::Polyline MakeRenderPolyline(const std::vector<const domain::Stop *> &stops, const SphereProjector &point_mapper, const size_t &pallet_num) const;
+    void MakeRenderText(std::vector<svg::Text> &result, const StopToPoint &stop_point, size_t &pallet_num ) const;
 
-    svg::Text MakeRenderText(const std::vector<const domain::Stop *> &stops, const SphereProjector &point_mapper) const;
+    //   void Render(std::vector<svg::Polyline> &polyline, std::ostream &out) const;
+    template <typename Container>
+    void Render(std::vector<Container> &obj) {
+        for (auto line : obj) {
+            doc_.Add(std::move(line));
+        }
+    }
 
-    void Render(std::vector<svg::Polyline> &polyline, std::ostream &out) const;
+    std::vector<svg::Circle> MakeRenderPoints() const;
+
+    void SetStopPoint(const StopToPoint &stop_point);
 
     const RenderSets &GetSets() const;
+
+    const std::vector<StopToPoint> &GetStopPoints() const;
+
+    void DocRender(std::ostream &out) const;
 
 private:
     RenderSets render_sets_;
     std::vector<StopToPoint> stop_points_;
+    svg::Document doc_;
 };

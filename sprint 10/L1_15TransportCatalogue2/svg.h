@@ -62,6 +62,9 @@ struct Point {
     Point(double x1, double y1)
         : x(x1), y(y1) {
     }
+    bool operator==(const Point &p) const {
+        return (*this).x != p.x || (*this).y != p.y;
+    }
     double x = 0;
     double y = 0;
 };

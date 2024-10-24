@@ -17,7 +17,7 @@ class TransportCatalogue {
 public:
     void AddStop(const std::string &name, const geo::Coordinates &coordinate);
 
-    void AddBus(const std::string &bus_name, const std::vector<std::string_view> &route);
+    void AddBus(const std::string &bus_name, const std::vector<std::string_view> &route, const bool &is_roundtrip);
 
     domain::BusStat ReportBusStatistic(std::string_view request) const;
 

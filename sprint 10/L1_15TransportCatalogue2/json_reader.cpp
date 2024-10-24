@@ -1,6 +1,6 @@
 #include <algorithm>
-#include <sstream>
 #include <set>
+#include <sstream>
 #include <vector>
 
 #include "json_reader.h"
@@ -33,7 +33,7 @@ void LoadCatalogue(TransportCatalogue &db, const std::vector<json::Node> &base_r
             if (!item.AsMap().at("is_roundtrip").AsBool()) {
                 string_vec.insert(string_vec.end(), std::next(string_vec.rbegin()), string_vec.rend());
             }
-            db.AddBus(item.AsMap().at("name").AsString(), string_vec);
+            db.AddBus(item.AsMap().at("name").AsString(), string_vec, item.AsMap().at("is_roundtrip").AsBool());
         }
     }
     for (const auto &stop : array_copy) {
@@ -147,12 +147,12 @@ void FillRenderSets(const json::Node &render_node, RenderSets &render_sets) {
             render_sets.color_palette.push_back(item.AsString());
         } else if (item.IsArray() && item.AsArray().size() == 3) {
             auto rgb = svg::Rgb(static_cast<uint8_t>(item.AsArray()[0].AsInt()),
-                                static_cast<uint8_t>(item.AsArray()[1].AsInt()), 
+                                static_cast<uint8_t>(item.AsArray()[1].AsInt()),
                                 static_cast<uint8_t>(item.AsArray()[2].AsInt()));
             render_sets.color_palette.push_back(rgb);
         } else {
             auto rgba = svg::Rgba(static_cast<uint8_t>(item.AsArray()[0].AsInt()),
-                                  static_cast<uint8_t>(item.AsArray()[1].AsInt()), 
+                                  static_cast<uint8_t>(item.AsArray()[1].AsInt()),
                                   static_cast<uint8_t>(item.AsArray()[2].AsInt()),
                                   item.AsArray()[3].AsDouble());
             render_sets.color_palette.push_back(rgba);
@@ -163,30 +163,48 @@ void FillRenderSets(const json::Node &render_node, RenderSets &render_sets) {
     }
 }
 
-std::vector<svg::Polyline> MakePolylineRender(const RequestHandler &req_handler, const MapRenderer &renderer) {
+void SetterStopPoints(const RequestHandler &req_handler, MapRenderer &renderer) {
     std::unordered_map<std::string_view, domain::Bus *> buses = req_handler.GetAllBusRoutes();
     // вектор тут не лучший вариант
     std::vector<geo::Coordinates> coordinate_pool;
     for (const auto &bus : buses) {
         for (const auto &stop : (*bus.second).stops) {
-        coordinate_pool.emplace_back((*stop).coordinate);
-    }}
+            coordinate_pool.emplace_back((*stop).coordinate);
+        }
+    }
     std::vector<svg::Polyline> result;
     // создание объекта для перевода географических координат в точки на плоскости
     SphereProjector point_mapper(coordinate_pool.begin(), coordinate_pool.end(), renderer.GetSets().width, renderer.GetSets().height, renderer.GetSets().padding);
-    auto bus_routes = req_handler.GetAllBusRoutes();
-    size_t pallet_num = 0;
-    std::map sorted_routes(bus_routes.begin(), bus_routes.end());
+    std::map sorted_routes(buses.begin(), buses.end());
     for (const auto &bus : sorted_routes) {
-        result.emplace_back(renderer.MakeRenderPolyline(bus.second->stops, point_mapper, pallet_num));
+        std::vector<std::pair<std::string_view, svg::Point>> tmp_points;
+        for (const auto &stop : (*bus.second).stops) {
+            tmp_points.push_back({(*stop).name, point_mapper((*stop).coordinate)});
+        }
+        renderer.SetStopPoint({bus.first, tmp_points, bus.second->is_roundtrip});
+    }
+}
+
+std::vector<svg::Polyline> MakePolylineMap(const MapRenderer &renderer) {
+    size_t pallet_num = 0;
+    std::vector<svg::Polyline> result;
+    for (const auto &stop_point : renderer.GetStopPoints()) {
+        result.emplace_back(renderer.MakeRenderPolyline(stop_point, pallet_num));
         ++pallet_num;
     }
     return result;
 }
 
+std::vector<svg::Text> MakeTextMap(const MapRenderer &renderer) {
+    size_t pallet_num = 0;
+    std::vector<svg::Text> result;
+    for (const auto &stop_point : renderer.GetStopPoints()) {
+        renderer.MakeRenderText(result, stop_point , pallet_num);
+        ++pallet_num;
+    }
+    return result;
+}
 
-
-
-void RenderSchema(std::vector<svg::Polyline> &p, std::ostream &out, const MapRenderer &renderer) {
-    return renderer.Render(p, out);
+std::vector<svg::Circle> SetDots(const MapRenderer &renderer) {
+    return renderer.MakeRenderPoints();
 }

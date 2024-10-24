@@ -4,8 +4,8 @@
 #include <string>
 
 #include "json_reader.h"
-#include "request_handler.h"
 #include "map_renderer.h"
+#include "request_handler.h"
 
 using namespace std;
 
@@ -27,13 +27,16 @@ int main() {
         throw std::invalid_argument("RenderSets contain invalid argument");
     }
     MapRenderer renderer(render_sets);
-    
-    
-    auto polyline_set = MakePolylineRender(req_handler, renderer);
 
-    RenderSchema(polyline_set, out, renderer);
+    SetterStopPoints(req_handler, renderer);
+    auto polyline_set = MakePolylineMap(renderer);
+    auto text = MakeTextMap(renderer);
+    auto dot = SetDots(renderer);
+
+    RenderSchema(polyline_set, renderer);
+    RenderSchema(text, renderer);
+    RenderSchema(dot, renderer);
+    renderer.DocRender(out);
 
     std::cout << out.str();
-
-
 }

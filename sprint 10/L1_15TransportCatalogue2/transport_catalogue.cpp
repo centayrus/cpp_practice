@@ -12,7 +12,7 @@ void TransportCatalogue::AddStop(const std::string &stop_name, const geo::Coordi
 }
 
 // Добавление маршрута в базу
-void TransportCatalogue::AddBus(const std::string &bus_name, const std::vector<std::string_view> &route) {
+void TransportCatalogue::AddBus(const std::string &bus_name, const std::vector<std::string_view> &route, const bool &is_roundtrip) {
     std::vector<const domain::Stop *> stop_list_for_bus;
     for (const auto &stop : route) {
         if (stopname_to_stop_.count(stop)) {
@@ -21,7 +21,7 @@ void TransportCatalogue::AddBus(const std::string &bus_name, const std::vector<s
         }
     }
     // маршрут и список остановок
-    bus_routes_.push_back({bus_name, stop_list_for_bus});
+    bus_routes_.push_back({bus_name, stop_list_for_bus, is_roundtrip});
     // ссылка на имя маршрута и дек маршрута-остновок
     busname_to_bus_.insert({bus_routes_.back().bus_route, &bus_routes_.back()});
     // Заполнение мапы для статистики остановок

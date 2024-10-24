@@ -28,6 +28,7 @@ struct Stop {
 struct Bus {
     std::string bus_route;
     std::vector<const Stop *> stops;
+    bool is_roundtrip;
 };
 
 struct BusStat {
