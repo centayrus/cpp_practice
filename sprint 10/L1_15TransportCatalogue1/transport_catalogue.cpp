@@ -13,10 +13,10 @@ void TransportCatalogue::AddStop(const std::string &stop_name, const geo::Coordi
 
 // Добавление маршрута в базу
 void TransportCatalogue::AddBus(const std::string &bus_name, const std::vector<std::string_view> &route) {
-    std::vector<const Stop *> stop_list_for_bus;
+    std::vector<const domain::Stop *> stop_list_for_bus;
     for (const auto &stop : route) {
         if (stopname_to_stop_.count(stop)) {
-            Stop *stop_ptr = stopname_to_stop_.at(stop);
+            domain::Stop *stop_ptr = stopname_to_stop_.at(stop);
             stop_list_for_bus.push_back(stop_ptr);
         }
     }
@@ -33,18 +33,18 @@ void TransportCatalogue::AddBus(const std::string &bus_name, const std::vector<s
 }
 
 // Статистика маршрута
-BusStat TransportCatalogue::ReportBusStatistic(std::string_view request) const {
+domain::BusStat TransportCatalogue::ReportBusStatistic(std::string_view request) const {
     auto bus_pos = busname_to_bus_.find(request);
     if (bus_pos == busname_to_bus_.end()) {
         return {};
     }
-    Bus bus = *(*bus_pos).second;
+    domain::Bus bus = *(*bus_pos).second;
     int common_stops_count = static_cast<int>(bus.stops.size());
     bool first_cycle = true;
     double total_distance = 0.;
     double route_distance = 0.;
     geo::Coordinates prev_location;
-    const Stop *prev_stop;
+    const domain::Stop *prev_stop;
     std::unordered_set<std::string_view> uniq_stops;
     for (const auto *stop_item : bus.stops) {
         uniq_stops.insert(stop_item->name);
@@ -64,27 +64,27 @@ BusStat TransportCatalogue::ReportBusStatistic(std::string_view request) const {
 }
 
 // Информация по остановке
-StopStat TransportCatalogue::ReportStopStatistic(std::string_view stopname) const {
+domain::StopStat TransportCatalogue::ReportStopStatistic(std::string_view stopname) const {
     std::string_view stop;
     if (stopname_to_stop_.count(stopname)) {
         stop = stopname;
     }
     auto stop_stat_pos = stopname_to_bus_.find(stopname);
-    std::vector<const Bus *> v_stop_stat;
+    std::vector<const domain::Bus *> v_stop_stat;
     if (stop_stat_pos != stopname_to_bus_.end()) {
         v_stop_stat.reserve((*stop_stat_pos).second.size());
         v_stop_stat = {(*stop_stat_pos).second.begin(), (*stop_stat_pos).second.end()};
     }
     // Сортировка вектора для корректного вывода статистики
-    std::sort(v_stop_stat.begin(), v_stop_stat.end(), [](const Bus *lhs, const Bus *rhs) {
+    std::sort(v_stop_stat.begin(), v_stop_stat.end(), [](const domain::Bus *lhs, const domain::Bus *rhs) {
         return std::lexicographical_compare((*lhs).bus_route.begin(), (*lhs).bus_route.end(),
                                             (*rhs).bus_route.begin(), (*rhs).bus_route.end());
     });
     return {stop, v_stop_stat};
 }
 
-double TransportCatalogue::GetDistance(const Stop *prev_stop, const Stop *cur_stop) const {
-    std::pair<const Stop *, const Stop *> key = std::make_pair(prev_stop, cur_stop);
+double TransportCatalogue::GetDistance(const domain::Stop *prev_stop, const domain::Stop *cur_stop) const {
+    std::pair<const domain::Stop *, const domain::Stop *> key = std::make_pair(prev_stop, cur_stop);
     auto value = stop_to_stop_dist_.find(key);
     if (value == stop_to_stop_dist_.end()) {
         key = std::make_pair(cur_stop, prev_stop);
@@ -99,7 +99,6 @@ void TransportCatalogue::SetDistance(const std::string_view a_name, const std::s
     stop_to_stop_dist_[{a_stop_ptr, b_stop_ptr}] = dist;
 }
 
-
-std::deque<Bus> &TransportCatalogue::GetAllRoutes() const {
-    return bus_routes_;
+const std::unordered_map<std::string_view, domain::Bus *> &TransportCatalogue::GetAllRoutes() const {
+    return busname_to_bus_;
 }

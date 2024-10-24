@@ -12,6 +12,9 @@ struct Coordinates {
     bool operator!=(const Coordinates &other) const {
         return !(*this == other);
     }
+    bool operator<(const Coordinates &other) const {
+        return lat < other.lat && lng < other.lng;
+    }
 };
 
 double ComputeDistance(Coordinates from, Coordinates to);

@@ -7,11 +7,11 @@
 #include <cstdlib>
 #include <iostream>
 #include <optional>
-#include <vector>
 #include <utility>
+#include <vector>
 
 inline const double EPSILON = 1e-6;
-bool IsZero(double value) {
+inline bool IsZero(double value) {
     return std::abs(value) < EPSILON;
 }
 
@@ -76,35 +76,79 @@ public:
 
 private:
     double padding_;
-    double min_lon_ = 0;
-    double max_lat_ = 0;
-    double zoom_coeff_ = 0;
+    double min_lon_ = 0.;
+    double max_lat_ = 0.;
+    double zoom_coeff_ = 0.;
 };
 
 struct RenderSets {
-    double width;
-    double height;
-    double padding;
-    double stop_radius;
-    double line_width;
-    int bus_label_font_size;
-    svg::Point bus_label_offset;
-    int stop_label_font_size;
-    svg::Point stop_label_offset;
-    svg::Rgba underlayer_color;
-    double underlayer_width;
-    std::variant<std::string, svg::Rgb> color_palette;
-    
+    double width = 0.;
+    double height = 0.;
+    double padding = 0.;
+    double stop_radius = 0.;
+    double line_width = 0.;
+    int bus_label_font_size = 0;
+    svg::Point bus_label_offset = {0., 0.};
+    int stop_label_font_size = 0;
+    svg::Point stop_label_offset = {0., 0.};
+    svg::Color underlayer_color;
+    double underlayer_width = 0.;
+    std::vector<svg::Color> color_palette;
+    bool validateRenderSets() const {
+        return validateWidth() && validateHeight() && validatePadding() && validateStopRadius() && validateBusLabelFontSize() && validateBusLabelOffset() && validateStopLabelFontSize() && validateStopLabelOffset() && validateUnderlayerWidth();
+    }
+
+private:
+    bool validateWidth() const {
+        return !(width < 0 || width > 100000.);
+    }
+    bool validateHeight() const {
+        return !(height < 0 || height > 100000.);
+    }
+    bool validatePadding() const {
+        return !(padding < 0 && padding > std::min(width, height) / 2);
+    }
+    bool validateStopRadius() const {
+        return !(stop_radius < 0 || stop_radius > 100000);
+    }
+    bool validateBusLabelFontSize() const {
+        return !(bus_label_font_size < 0. || bus_label_font_size > 100000.);
+    }
+    bool validateBusLabelOffset() const {
+        return !(bus_label_offset.x < -100000. || bus_label_offset.y > 100000. || bus_label_offset.x < -100000. || bus_label_offset.y > 100000.);
+    }
+    bool validateStopLabelFontSize() const {
+        return !(stop_label_font_size < 0 || stop_label_font_size > 100000.);
+    }
+    bool validateStopLabelOffset() const {
+        return !(stop_label_offset.x < -100000. || stop_label_offset.y > 100000. || stop_label_offset.x < -100000. || stop_label_offset.y > 100000.);
+    }
+    bool validateUnderlayerWidth() const {
+        return !(underlayer_width < 0. || underlayer_width > 100000.);
+    }
 };
 
-class MapRenderer() {
+struct StopToPoint {
+    std::string_view stop;
+    std::vector<svg::Point> point;
+};
+
+class MapRenderer {
 public:
-    MapRenderer(RenderSets rs) : render_sets_(rs) {}
+    MapRenderer() = default;
+    MapRenderer(RenderSets rs);
 
-    MakeBusRender()
+    void FillStopPoints();
 
-    MakeStopRender()
+    svg::Polyline MakeRenderPolyline(const std::vector<const domain::Stop *> &stops, const SphereProjector &point_mapper, const size_t &pallet_num) const;
+
+    svg::Text MakeRenderText(const std::vector<const domain::Stop *> &stops, const SphereProjector &point_mapper) const;
+
+    void Render(std::vector<svg::Polyline> &polyline, std::ostream &out) const;
+
+    const RenderSets &GetSets() const;
 
 private:
     RenderSets render_sets_;
-}
+    std::vector<StopToPoint> stop_points_;
+};

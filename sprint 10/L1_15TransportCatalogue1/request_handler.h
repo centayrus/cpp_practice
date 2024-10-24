@@ -8,14 +8,15 @@ public:
     RequestHandler(const TransportCatalogue& db);
 
     // Возвращает информацию о маршруте (запрос Bus)
-    BusStat GetBusStat(const std::string_view& bus_name) const;
+    domain::BusStat GetBusStat(const std::string_view& bus_name) const;
 
     // Возвращает маршруты, проходящие через
-    StopStat GetBusesByStop(const std::string_view& stop_name) const;
+    domain::StopStat GetBusesByStop(const std::string_view& stop_name) const;
 
-    std::deque<Bus> GetAllBusRoutes() const;
+    std::unordered_map<std::string_view, domain::Bus *> GetAllBusRoutes() const;
 
 private:
     // RequestHandler использует агрегацию объектов "Транспортный Справочник" и "Визуализатор Карты"
     const TransportCatalogue& db_;
 };
+

@@ -1,8 +1,10 @@
 #include <algorithm>
 #include <sstream>
+#include <set>
 #include <vector>
 
 #include "json_reader.h"
+#include "map_renderer.h"
 
 /*
  * Здесь можно разместить код наполнения транспортного справочника данными из JSON,
@@ -36,13 +38,16 @@ void LoadCatalogue(TransportCatalogue &db, const std::vector<json::Node> &base_r
     }
     for (const auto &stop : array_copy) {
         if (stop.AsMap().at("type").AsString() == "Stop") {
-            for (const auto &stop_list : stop.AsMap().at("road_distances").AsMap()) {
-                db.SetDistance(stop.AsMap().at("name").AsString(), stop_list.first, stop_list.second.AsInt());
+            if (stop.AsMap().count("road_distances")) {
+                for (const auto &stop_list : stop.AsMap().at("road_distances").AsMap()) {
+                    db.SetDistance(stop.AsMap().at("name").AsString(), stop_list.first, stop_list.second.AsInt());
+                }
             }
         }
     }
 }
 
+// не используется в данной задаче
 json::Document GetReqsResults(const RequestHandler &req_handler, const std::vector<json::Node> &base_req) {
     std::istringstream strm("[]");
     json::Document result_doc = json::Load(strm);
@@ -50,10 +55,10 @@ json::Document GetReqsResults(const RequestHandler &req_handler, const std::vect
     for (auto &req : base_req) {
         auto req_id = req.AsMap().at("id").AsInt();
         if (req.AsMap().at("type").AsString() == "Stop") {
-            StopStat stop_stat = req_handler.GetBusesByStop(req.AsMap().at("name").AsString());
+            domain::StopStat stop_stat = req_handler.GetBusesByStop(req.AsMap().at("name").AsString());
             tmp_node = StopStatLoad(std::move(stop_stat), req_id);
         } else {
-            BusStat bus_stat = req_handler.GetBusStat(req.AsMap().at("name").AsString());
+            domain::BusStat bus_stat = req_handler.GetBusStat(req.AsMap().at("name").AsString());
             tmp_node = BusStatLoad(std::move(bus_stat), req_id);
         }
         const_cast<std::vector<json::Node> &>(result_doc.GetRoot().AsArray()).push_back(tmp_node);
@@ -61,7 +66,7 @@ json::Document GetReqsResults(const RequestHandler &req_handler, const std::vect
     return result_doc;
 }
 
-json::Node BusStatLoad(const BusStat bus_stat, const int req_id) {
+json::Node BusStatLoad(const domain::BusStat bus_stat, const int req_id) {
     std::string json_str;
     if (!bus_stat) {
         json_str += "{\"request_id\":";
@@ -85,7 +90,7 @@ json::Node BusStatLoad(const BusStat bus_stat, const int req_id) {
     return doc_item.GetRoot();
 }
 
-json::Node StopStatLoad(const StopStat stop_stat, const int req_id) {
+json::Node StopStatLoad(const domain::StopStat stop_stat, const int req_id) {
     std::string json_str;
     if (!stop_stat) {
         json_str += "{\"request_id\":";
@@ -121,10 +126,67 @@ void FillRenderSets(const json::Node &render_node, RenderSets &render_sets) {
     render_sets.line_width = attrs.at("line_width").AsDouble();
     render_sets.stop_radius = attrs.at("stop_radius").AsDouble();
     render_sets.bus_label_font_size = attrs.at("bus_label_font_size").AsInt();
-    render_sets.bus_label_offset = svg::Point(attrs.at("bus_label_offset").AsArray()[0], attrs.at("bus_label_offset").AsArray()[1]);
+    render_sets.bus_label_offset = svg::Point(attrs.at("bus_label_offset").AsArray()[0].AsDouble(), attrs.at("bus_label_offset").AsArray()[1].AsDouble());
     render_sets.stop_label_font_size = attrs.at("stop_label_font_size").AsInt();
-    render_sets.stop_label_offset = svg::Point(attrs.at("stop_label_offset").AsArray()[0], attrs.at("stop_label_offset").AsArray()[1]);
-    render_sets.underlayer_color = svg::Rgba(attrs.at("underlayer_color").AsArray()[0] attrs.at("underlayer_color").AsArray()[1] attrs.at("underlayer_color").AsArray()[2] attrs.at("underlayer_color").AsArray()[3]);
+    render_sets.stop_label_offset = svg::Point(attrs.at("stop_label_offset").AsArray()[0].AsDouble(), attrs.at("stop_label_offset").AsArray()[1].AsDouble());
     render_sets.underlayer_width = attrs.at("underlayer_width").AsDouble();
-    render_sets.color_palette = attrs.at("color_palette").AsArray();
+    if (attrs.at("underlayer_color").IsArray() && attrs.at("underlayer_color").AsArray().size() == 4) {
+        render_sets.underlayer_color = svg::Rgba(static_cast<uint8_t>(attrs.at("underlayer_color").AsArray()[0].AsInt()),
+                                                 static_cast<uint8_t>(attrs.at("underlayer_color").AsArray()[1].AsInt()),
+                                                 static_cast<uint8_t>(attrs.at("underlayer_color").AsArray()[2].AsInt()),
+                                                 attrs.at("underlayer_color").AsArray()[3].AsDouble());
+    } else if (attrs.at("underlayer_color").IsString()) {
+        render_sets.underlayer_color = attrs.at("underlayer_color").AsString();
+    } else {
+        render_sets.underlayer_color = svg::Rgb(static_cast<uint8_t>(attrs.at("underlayer_color").AsArray()[0].AsInt()),
+                                                static_cast<uint8_t>(attrs.at("underlayer_color").AsArray()[1].AsInt()),
+                                                static_cast<uint8_t>(attrs.at("underlayer_color").AsArray()[2].AsInt()));
+    }
+    for (const auto &item : attrs.at("color_palette").AsArray()) {
+        if (item.IsString()) {
+            render_sets.color_palette.push_back(item.AsString());
+        } else if (item.IsArray() && item.AsArray().size() == 3) {
+            auto rgb = svg::Rgb(static_cast<uint8_t>(item.AsArray()[0].AsInt()),
+                                static_cast<uint8_t>(item.AsArray()[1].AsInt()), 
+                                static_cast<uint8_t>(item.AsArray()[2].AsInt()));
+            render_sets.color_palette.push_back(rgb);
+        } else {
+            auto rgba = svg::Rgba(static_cast<uint8_t>(item.AsArray()[0].AsInt()),
+                                  static_cast<uint8_t>(item.AsArray()[1].AsInt()), 
+                                  static_cast<uint8_t>(item.AsArray()[2].AsInt()),
+                                  item.AsArray()[3].AsDouble());
+            render_sets.color_palette.push_back(rgba);
+        }
+    }
+    if (!render_sets.validateRenderSets()) {
+        throw std::invalid_argument("Render set attrs is not valid");
+    }
+}
+
+std::vector<svg::Polyline> MakePolylineRender(const RequestHandler &req_handler, const MapRenderer &renderer) {
+    std::unordered_map<std::string_view, domain::Bus *> buses = req_handler.GetAllBusRoutes();
+    // вектор тут не лучший вариант
+    std::vector<geo::Coordinates> coordinate_pool;
+    for (const auto &bus : buses) {
+        for (const auto &stop : (*bus.second).stops) {
+        coordinate_pool.emplace_back((*stop).coordinate);
+    }}
+    std::vector<svg::Polyline> result;
+    // создание объекта для перевода географических координат в точки на плоскости
+    SphereProjector point_mapper(coordinate_pool.begin(), coordinate_pool.end(), renderer.GetSets().width, renderer.GetSets().height, renderer.GetSets().padding);
+    auto bus_routes = req_handler.GetAllBusRoutes();
+    size_t pallet_num = 0;
+    std::map sorted_routes(bus_routes.begin(), bus_routes.end());
+    for (const auto &bus : sorted_routes) {
+        result.emplace_back(renderer.MakeRenderPolyline(bus.second->stops, point_mapper, pallet_num));
+        ++pallet_num;
+    }
+    return result;
+}
+
+
+
+
+void RenderSchema(std::vector<svg::Polyline> &p, std::ostream &out, const MapRenderer &renderer) {
+    return renderer.Render(p, out);
 }

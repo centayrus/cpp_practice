@@ -37,7 +37,6 @@ void Circle::RenderObject(const RenderContext &context) const {
 
 // ---------- Polyline ------------------
 Polyline &Polyline::AddPoint(Point point) {
-    // line_points_.emplace_back(point.x);
     line_points_.emplace_back(point);
     return *this;
 }
