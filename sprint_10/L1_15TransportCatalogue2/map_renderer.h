@@ -128,6 +128,8 @@ private:
     }
 };
 
+using StopItem = std::map<std::string_view, svg::Point>;
+
 struct StopToPoint {
     std::string_view bus;
     std::vector<std::pair<std::string_view, svg::Point>> point;
@@ -141,9 +143,10 @@ public:
 
     svg::Polyline MakeRenderPolyline(const StopToPoint &stop_point, const size_t &pallet_num) const;
 
-    void MakeRenderText(std::vector<svg::Text> &result, const StopToPoint &stop_point, size_t &pallet_num ) const;
+    void MakeRenderBusName(std::vector<svg::Text> &result, const StopToPoint &stop_point, size_t &pallet_num ) const;
 
-    //   void Render(std::vector<svg::Polyline> &polyline, std::ostream &out) const;
+    void MakeRenderStopName(std::vector<svg::Text> &result) const;
+
     template <typename Container>
     void Render(std::vector<Container> &obj) {
         for (auto line : obj) {
@@ -161,8 +164,11 @@ public:
 
     void DocRender(std::ostream &out) const;
 
+    void SetUniqStop(const StopItem stop_item);
+
 private:
     RenderSets render_sets_;
     std::vector<StopToPoint> stop_points_;
     svg::Document doc_;
+    StopItem unique_stops_;
 };

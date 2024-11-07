@@ -163,7 +163,7 @@ void FillRenderSets(const json::Node &render_node, RenderSets &render_sets) {
     }
 }
 
-void SetterStopPoints(const RequestHandler &req_handler, MapRenderer &renderer) {
+void StopPointsSetter(const RequestHandler &req_handler, MapRenderer &renderer) {
     std::unordered_map<std::string_view, domain::Bus *> buses = req_handler.GetAllBusRoutes();
     // вектор тут не лучший вариант
     std::vector<geo::Coordinates> coordinate_pool;
@@ -176,13 +176,17 @@ void SetterStopPoints(const RequestHandler &req_handler, MapRenderer &renderer) 
     // создание объекта для перевода географических координат в точки на плоскости
     SphereProjector point_mapper(coordinate_pool.begin(), coordinate_pool.end(), renderer.GetSets().width, renderer.GetSets().height, renderer.GetSets().padding);
     std::map sorted_routes(buses.begin(), buses.end());
+    StopItem uniq_stops;
     for (const auto &bus : sorted_routes) {
         std::vector<std::pair<std::string_view, svg::Point>> tmp_points;
         for (const auto &stop : (*bus.second).stops) {
             tmp_points.push_back({(*stop).name, point_mapper((*stop).coordinate)});
+            uniq_stops[tmp_points.back().first] = std::move(tmp_points.back().second);
         }
         renderer.SetStopPoint({bus.first, tmp_points, bus.second->is_roundtrip});
+        renderer.SetUniqStop(uniq_stops);
     }
+
 }
 
 std::vector<svg::Polyline> MakePolylineMap(const MapRenderer &renderer) {
@@ -195,13 +199,21 @@ std::vector<svg::Polyline> MakePolylineMap(const MapRenderer &renderer) {
     return result;
 }
 
-std::vector<svg::Text> MakeTextMap(const MapRenderer &renderer) {
+std::vector<svg::Text> MakeBusNameTextMap(const MapRenderer &renderer) {
     size_t pallet_num = 0;
     std::vector<svg::Text> result;
     for (const auto &stop_point : renderer.GetStopPoints()) {
-        renderer.MakeRenderText(result, stop_point , pallet_num);
+        renderer.MakeRenderBusName(result, stop_point, pallet_num);
         ++pallet_num;
     }
+    return result;
+}
+
+std::vector<svg::Text> MakeStopNameTextMap(const MapRenderer &renderer) {
+    //size_t pallet_num = 0;
+    std::vector<svg::Text> result;
+    renderer.MakeRenderStopName(result/* , pallet_num */);
+        //++pallet_num;
     return result;
 }
 

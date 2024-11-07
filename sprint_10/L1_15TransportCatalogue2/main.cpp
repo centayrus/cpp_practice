@@ -28,14 +28,16 @@ int main() {
     }
     MapRenderer renderer(render_sets);
 
-    SetterStopPoints(req_handler, renderer);
+    StopPointsSetter(req_handler, renderer);
     auto polyline_set = MakePolylineMap(renderer);
-    auto text = MakeTextMap(renderer);
+    auto bus_text = MakeBusNameTextMap(renderer);
     auto dot = SetDots(renderer);
+    auto stop_text = MakeStopNameTextMap(renderer);
 
     RenderSchema(polyline_set, renderer);
-    RenderSchema(text, renderer);
+    RenderSchema(bus_text, renderer);
     RenderSchema(dot, renderer);
+    RenderSchema(stop_text, renderer);
     renderer.DocRender(out);
 
     std::cout << out.str();

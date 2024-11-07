@@ -16,7 +16,7 @@ svg::Polyline MapRenderer::MakeRenderPolyline(const StopToPoint &stop_point, con
     return line;
 }
 
-void MapRenderer::MakeRenderText(std::vector<svg::Text> &result, const StopToPoint &stop_point, size_t &pallet_num) const {
+void MapRenderer::MakeRenderBusName(std::vector<svg::Text> &result, const StopToPoint &stop_point, size_t &pallet_num) const {
     svg::Text text1, text2;
     std::vector<svg::Point> point;
     size_t pallet_size = render_sets_.color_palette.size();
@@ -32,6 +32,17 @@ void MapRenderer::MakeRenderText(std::vector<svg::Text> &result, const StopToPoi
         text1.SetPosition(pnt).SetData(str).SetFillColor(render_sets_.underlayer_color).SetStrokeColor(render_sets_.underlayer_color).SetStrokeWidth(render_sets_.underlayer_width).SetStrokeLineCap(svg::StrokeLineCap::ROUND).SetStrokeLineJoin(svg::StrokeLineJoin::ROUND).SetOffset(render_sets_.bus_label_offset).SetFontSize(static_cast<uint8_t>(render_sets_.bus_label_font_size)).SetFontWeight("bold").SetFontFamily("Verdana");
         result.push_back(text1);
         text2.SetPosition(pnt).SetData(str).SetFillColor(render_sets_.color_palette.at(pallet_num % pallet_size)).SetOffset(render_sets_.bus_label_offset).SetFontSize(static_cast<uint8_t>(render_sets_.bus_label_font_size)).SetFontFamily("Verdana").SetFontWeight("bold");
+        result.push_back(text2);
+    }
+}
+
+void MapRenderer::MakeRenderStopName(std::vector<svg::Text> &result) const {
+    svg::Text text1, text2;
+    for (const auto &item : unique_stops_) {
+        std::string str(item.first);
+        text1.SetPosition((item.second)).SetOffset(render_sets_.stop_label_offset).SetFontSize(static_cast<uint8_t>(render_sets_.stop_label_font_size)).SetFontFamily("Verdana").SetFillColor(render_sets_.underlayer_color).SetStrokeColor(render_sets_.underlayer_color).SetStrokeWidth(render_sets_.underlayer_width).SetStrokeLineCap(svg::StrokeLineCap::ROUND).SetStrokeLineJoin(svg::StrokeLineJoin::ROUND).SetData(str);
+        result.push_back(text1);
+        text2.SetPosition((item.second)).SetOffset(render_sets_.stop_label_offset).SetFontSize(static_cast<uint8_t>(render_sets_.stop_label_font_size)).SetFontFamily("Verdana").SetFillColor("black").SetData(str);
         result.push_back(text2);
     }
 }
@@ -66,4 +77,8 @@ const std::vector<StopToPoint> &MapRenderer::GetStopPoints() const {
 
 void MapRenderer::DocRender(std::ostream &out) const {
     doc_.Render(out);
+}
+
+void MapRenderer::SetUniqStop(const StopItem stop_item) {
+    unique_stops_ = std::move(stop_item);
 }
