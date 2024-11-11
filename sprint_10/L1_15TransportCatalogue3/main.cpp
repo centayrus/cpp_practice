@@ -11,14 +11,13 @@ using namespace std;
 
 int main() {
 
-    std::ostringstream out, out1;
+    std::ostringstream out;
     TransportCatalogue catalogue;
 
     const auto json = json::Load(std::cin);
     auto base_data = json.GetRoot().AsMap().at("base_requests"s).AsArray(); // вектор для заполнения базы
-    auto base_req = json.GetRoot().AsMap().at("stat_requests"s).AsArray();  // вектор с запросами
-    auto render_node = json.GetRoot().AsMap().at("render_settings"s);       // 
-    auto map_req = json.GetRoot().AsMap().at("Map"s);       // 
+    auto base_req = json.GetRoot().AsMap().at("stat_requests"s).AsArray();  // вектор с запросами, в ответ на него возвращается статистика
+    auto render_node = json.GetRoot().AsMap().at("render_settings"s);       // свойства для отрисовки
 
     LoadCatalogue(catalogue, base_data);
     RequestHandler req_handler(catalogue);
@@ -29,7 +28,12 @@ int main() {
     }
     MapRenderer renderer(render_sets);
 
-    StopPointsSetter(req_handler, renderer);
+    // работа с json
+    json::Document doc = GetReqsResults(req_handler, base_req, renderer);
+    json::Print(doc, out);
+
+    // работа с svg
+    /*  StopPointsSetter(req_handler, renderer);
     auto polyline_set = MakePolylineMap(renderer);
     auto bus_text = MakeBusNameTextMap(renderer);
     auto dot = SetDots(renderer);
@@ -39,9 +43,8 @@ int main() {
     RenderSchema(bus_text, renderer);
     RenderSchema(dot, renderer);
     RenderSchema(stop_text, renderer);
-    renderer.DocRender(out);
+    renderer.DocRender(out);  */
 
-    
-
-    std::cout << out.str();
+    // вывод
+     std::cout << out.str();
 }
