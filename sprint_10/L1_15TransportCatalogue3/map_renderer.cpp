@@ -12,7 +12,11 @@ svg::Polyline MapRenderer::MakeRenderPolyline(const StopToPoint &stop_point, con
     for (const auto &point : stop_point.point) {
         line.AddPoint(point.second);
     }
-    line.SetFillColor("none").SetStrokeColor(render_sets_.color_palette.at(pallet_num % pallet_count)).SetStrokeLineCap(svg::StrokeLineCap::ROUND).SetStrokeLineJoin(svg::StrokeLineJoin::ROUND).SetStrokeWidth(render_sets_.line_width);
+    line.SetFillColor("none")
+        .SetStrokeColor(render_sets_.color_palette.at(pallet_num % pallet_count))
+        .SetStrokeLineCap(svg::StrokeLineCap::ROUND)
+        .SetStrokeLineJoin(svg::StrokeLineJoin::ROUND)
+        .SetStrokeWidth(render_sets_.line_width);
     return line;
 }
 
@@ -21,7 +25,7 @@ void MapRenderer::MakeRenderBusName(std::vector<svg::Text> &result, const StopTo
     std::vector<svg::Point> point;
     size_t pallet_size = render_sets_.color_palette.size();
     auto point_num = stop_point.point.size();
-    if (stop_point.is_roundtrip || stop_point.point.back().second == stop_point.point.at(point_num / 2).second ) {
+    if (stop_point.is_roundtrip || stop_point.point.back().second == stop_point.point.at(point_num / 2).second) {
         point.push_back(stop_point.point.back().second);
     } else {
         point.push_back(stop_point.point.back().second);
@@ -29,9 +33,25 @@ void MapRenderer::MakeRenderBusName(std::vector<svg::Text> &result, const StopTo
     }
     for (const auto &pnt : point) {
         std::string str(stop_point.bus);
-        text1.SetPosition(pnt).SetData(str).SetFillColor(render_sets_.underlayer_color).SetStrokeColor(render_sets_.underlayer_color).SetStrokeWidth(render_sets_.underlayer_width).SetStrokeLineCap(svg::StrokeLineCap::ROUND).SetStrokeLineJoin(svg::StrokeLineJoin::ROUND).SetOffset(render_sets_.bus_label_offset).SetFontSize(static_cast<uint32_t>(render_sets_.bus_label_font_size)).SetFontWeight("bold").SetFontFamily("Verdana");
+        text1.SetPosition(pnt)
+            .SetData(str)
+            .SetFillColor(render_sets_.underlayer_color)
+            .SetStrokeColor(render_sets_.underlayer_color)
+            .SetStrokeWidth(render_sets_.underlayer_width)
+            .SetStrokeLineCap(svg::StrokeLineCap::ROUND)
+            .SetStrokeLineJoin(svg::StrokeLineJoin::ROUND)
+            .SetOffset(render_sets_.bus_label_offset)
+            .SetFontSize(static_cast<uint32_t>(render_sets_.bus_label_font_size))
+            .SetFontWeight("bold")
+            .SetFontFamily("Verdana");
         result.push_back(text1);
-        text2.SetPosition(pnt).SetData(str).SetFillColor(render_sets_.color_palette.at(pallet_num % pallet_size)).SetOffset(render_sets_.bus_label_offset).SetFontSize(static_cast<uint32_t>(render_sets_.bus_label_font_size)).SetFontFamily("Verdana").SetFontWeight("bold");
+        text2.SetPosition(pnt)
+            .SetData(str)
+            .SetFillColor(render_sets_.color_palette.at(pallet_num % pallet_size))
+            .SetOffset(render_sets_.bus_label_offset)
+            .SetFontSize(static_cast<uint32_t>(render_sets_.bus_label_font_size))
+            .SetFontFamily("Verdana")
+            .SetFontWeight("bold");
         result.push_back(text2);
     }
 }
@@ -40,9 +60,23 @@ void MapRenderer::MakeRenderStopName(std::vector<svg::Text> &result) const {
     svg::Text text1, text2;
     for (const auto &item : unique_stops_) {
         std::string str(item.first);
-        text1.SetPosition((item.second)).SetOffset(render_sets_.stop_label_offset).SetFontSize(static_cast<uint32_t>(render_sets_.stop_label_font_size)).SetFontFamily("Verdana").SetFillColor(render_sets_.underlayer_color).SetStrokeColor(render_sets_.underlayer_color).SetStrokeWidth(render_sets_.underlayer_width).SetStrokeLineCap(svg::StrokeLineCap::ROUND).SetStrokeLineJoin(svg::StrokeLineJoin::ROUND).SetData(str);
+        text1.SetPosition((item.second))
+            .SetOffset(render_sets_.stop_label_offset)
+            .SetFontSize(static_cast<uint32_t>(render_sets_.stop_label_font_size))
+            .SetFontFamily("Verdana")
+            .SetFillColor(render_sets_.underlayer_color)
+            .SetStrokeColor(render_sets_.underlayer_color)
+            .SetStrokeWidth(render_sets_.underlayer_width)
+            .SetStrokeLineCap(svg::StrokeLineCap::ROUND)
+            .SetStrokeLineJoin(svg::StrokeLineJoin::ROUND)
+            .SetData(str);
         result.push_back(text1);
-        text2.SetPosition((item.second)).SetOffset(render_sets_.stop_label_offset).SetFontSize(static_cast<uint32_t>(render_sets_.stop_label_font_size)).SetFontFamily("Verdana").SetFillColor("black").SetData(str);
+        text2.SetPosition((item.second))
+            .SetOffset(render_sets_.stop_label_offset)
+            .SetFontSize(static_cast<uint32_t>(render_sets_.stop_label_font_size))
+            .SetFontFamily("Verdana")
+            .SetFillColor("black")
+            .SetData(str);
         result.push_back(text2);
     }
 }

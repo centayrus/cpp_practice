@@ -100,7 +100,7 @@ struct RenderSets {
     }
 
 private:
-// валидация заполняемых данных
+    // валидация заполняемых данных
     bool validateWidth() const {
         return !(width < 0 || width > 100000.);
     }
@@ -144,11 +144,11 @@ public:
     MapRenderer() = default;
     MapRenderer(RenderSets rs);
 
-// рендеринг ломаной
+    // рендеринг ломаной
     svg::Polyline MakeRenderPolyline(const StopToPoint &stop_point, const size_t &pallet_num) const;
-// рендеринг названий маршрута на конечных
-    void MakeRenderBusName(std::vector<svg::Text> &result, const StopToPoint &stop_point, size_t &pallet_num ) const;
-// рендеринг остановок
+    // рендеринг названий маршрута на конечных
+    void MakeRenderBusName(std::vector<svg::Text> &result, const StopToPoint &stop_point, size_t &pallet_num) const;
+    // рендеринг остановок
     void MakeRenderStopName(std::vector<svg::Text> &result) const;
 
     template <typename Container>
@@ -157,18 +157,18 @@ public:
             doc_.Add(std::move(line));
         }
     }
-// задание точек маршрута
+    // задание точек маршрута
     std::vector<svg::Circle> MakeRenderPoints() const;
-// заполнение остановками поля класса
+    // заполнение остановками поля класса
     void SetStopPoint(const StopToPoint &stop_point);
 
     const RenderSets &GetSets() const;
 
     const std::vector<StopToPoint> &GetStopPoints() const;
 
-// вывод в поток out объектов svg
+    // вывод в поток out объектов svg
     void DocRender(std::ostream &out) const;
-// получение уникальных остановок
+    // получение уникальных остановок
     void SetUniqStop(const StopItem stop_item);
 
 private:

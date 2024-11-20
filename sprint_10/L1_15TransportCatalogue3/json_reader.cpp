@@ -6,18 +6,7 @@
 #include "json_reader.h"
 #include "map_renderer.h"
 
-
-void LoadCatalogue(TransportCatalogue &db, const std::vector<json::Node> &base_req) {
-    std::vector<json::Node> array_copy;
-    // копирование array, чтобы обойти константность при сортировке
-    for (auto const &item : base_req) {
-        if (item.AsMap().at("type").AsString() == "Stop")
-            array_copy.push_back(item);
-    }
-    for (auto const &item : base_req) {
-        if (item.AsMap().at("type").AsString() == "Bus")
-            array_copy.push_back(item);
-    }
+void FillBusesAndStops(TransportCatalogue &db, const std::vector<json::Node> &array_copy) {
     for (const auto &item : array_copy) {
         if (item.AsMap().at("type").AsString() == "Stop") {
             db.AddStop(item.AsMap().at("name").AsString(), {item.AsMap().at("latitude").AsDouble(), item.AsMap().at("longitude").AsDouble()});
@@ -32,6 +21,9 @@ void LoadCatalogue(TransportCatalogue &db, const std::vector<json::Node> &base_r
             db.AddBus(item.AsMap().at("name").AsString(), string_vec, item.AsMap().at("is_roundtrip").AsBool());
         }
     }
+}
+
+void FillRoadDistances(TransportCatalogue &db, const std::vector<json::Node> &array_copy) {
     for (const auto &stop : array_copy) {
         if (stop.AsMap().at("type").AsString() == "Stop") {
             if (stop.AsMap().count("road_distances")) {
@@ -41,6 +33,21 @@ void LoadCatalogue(TransportCatalogue &db, const std::vector<json::Node> &base_r
             }
         }
     }
+}
+
+void LoadCatalogue(TransportCatalogue &db, const std::vector<json::Node> &base_req) {
+    std::vector<json::Node> array_copy;
+    // копирование array, чтобы обойти константность при сортировке
+    for (auto const &item : base_req) {
+        if (item.AsMap().at("type").AsString() == "Stop")
+            array_copy.push_back(item);
+    }
+    for (auto const &item : base_req) {
+        if (item.AsMap().at("type").AsString() == "Bus")
+            array_copy.push_back(item);
+    }
+    FillBusesAndStops(db, array_copy);
+    FillRoadDistances(db, array_copy);
 }
 
 void MakeSvg(std::ostream &out, const RequestHandler &req_handler, MapRenderer &renderer) {
