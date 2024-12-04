@@ -1,5 +1,6 @@
 #include <cassert>
 #include <functional>
+#include <optional>
 #include <string>
 
 using namespace std;
@@ -7,13 +8,23 @@ using namespace std;
 template <typename T>
 class LazyValue {
 public:
-    explicit LazyValue(function<T()> init);
+    explicit LazyValue(function<T()> init)
+        : initializer_(move(init)), value_() {};
 
-    bool HasValue() const;
-    const T& Get() const;
+    bool HasValue() const {
+        return value_.has_value();
+    }
+    const T &Get() const {
+        if (!value_) {
+            value_ = initializer_();
+        }
+        return *value_;
+    }
 
 private:
-    T func_;
+    function<T()> initializer_;
+    mutable optional<T> value_;
+
 };
 
 void UseExample() {
