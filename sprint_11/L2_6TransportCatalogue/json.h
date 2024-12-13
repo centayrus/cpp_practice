@@ -21,7 +21,9 @@ class Node final
     : private std::variant<std::nullptr_t, Array, Dict, bool, int, double, std::string> {
 public:
     using variant::variant;
-    using Value = variant;
+	using Value = variant;
+    
+    Node(Value value) : variant(std::move(value)) {}
 
     bool IsInt() const {
         return std::holds_alternative<int>(*this);
@@ -64,6 +66,19 @@ public:
         return std::holds_alternative<std::nullptr_t>(*this);
     }
 
+        bool IsMap() const {
+        return std::holds_alternative<Dict>(*this);
+    }    
+        
+    const Dict& AsDict() const {
+        using namespace std::literals;
+        if (!IsDict()) {
+            throw std::logic_error("Not a dict"s);
+        }
+
+        return std::get<Dict>(*this);
+    }
+        
     bool IsArray() const {
         return std::holds_alternative<Array>(*this);
     }
@@ -91,20 +106,16 @@ public:
     bool IsDict() const {
         return std::holds_alternative<Dict>(*this);
     }
-    const Dict& AsDict() const {
-        using namespace std::literals;
-        if (!IsDict()) {
-            throw std::logic_error("Not a dict"s);
-        }
 
-        return std::get<Dict>(*this);
-    }
 
     bool operator==(const Node& rhs) const {
         return GetValue() == rhs.GetValue();
     }
 
-    /*const*/ Value& GetValue() const {
+    const Value& GetValue() const {
+        return *this;
+    }
+    Value& GetValue() {
         return *this;
     }
 };
