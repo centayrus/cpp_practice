@@ -33,17 +33,17 @@ Builder::DictValueContext Builder::Key(std::string key) {
 }
 
 Builder::BaseContext Builder::Value(Node::Value value) {
-    AddObject(std::move(value), /* one_shot */ true);
+    AddObject(std::move(value), true);
     return *this;
 }
 
 Builder::DictItemContext Builder::StartDict() {
-    AddObject(Dict{}, /* one_shot */ false);
+    AddObject(Dict{}, false);
     return BaseContext{*this};
 }
 
 Builder::ArrayItemContext Builder::StartArray() {
-    AddObject(Array{}, /* one_shot */ false);
+    AddObject(Array{}, false);
     return BaseContext{*this};
 }
 
@@ -62,11 +62,6 @@ Builder::BaseContext Builder::EndArray() {
     nodes_stack_.pop_back();
     return *this;
 }
-    
-// Current value can be:
-// * Dict, when .Key().Value() or EndDict() is expected
-// * Array, when .Value() or EndArray() is expected
-// * nullptr (default), when first call or dict Value() is expected
 
 Node::Value& Builder::GetCurrentValue() {
     if (nodes_stack_.empty()) {
@@ -89,7 +84,6 @@ void Builder::AssertNewObjectContext() const {
 void Builder::AddObject(Node::Value value, bool one_shot) {
     Node::Value& host_value = GetCurrentValue();
     if (std::holds_alternative<Array>(host_value)) {
-        // Tell about emplace_back
         Node& node
             = std::get<Array>(host_value).emplace_back(std::move(value));
         if (!one_shot) {

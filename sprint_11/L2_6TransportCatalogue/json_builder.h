@@ -19,8 +19,8 @@ public:
     DictValueContext Key(std::string key);
     BaseContext Value(Node::Value value);
     DictItemContext StartDict();
-    ArrayItemContext StartArray();
     BaseContext EndDict();
+    ArrayItemContext StartArray();
     BaseContext EndArray();
 
 private:
@@ -33,12 +33,7 @@ private:
     void AssertNewObjectContext() const;
     void AddObject(Node::Value value, bool one_shot);
     
-    // Key() → Value(), StartDict(), StartArray()
-    // StartDict() → Key(), EndDict()
-    // Key() → Value() → Key(), EndDict()
-    // StartArray() → Value(), StartDict(), StartArray(), EndArray() 
-    // StartArray() → Value() → Value(), StartDict(), StartArray(), EndArray() 
-    
+
     class BaseContext {
     public:
         BaseContext(Builder& builder) : builder_(builder) {}
