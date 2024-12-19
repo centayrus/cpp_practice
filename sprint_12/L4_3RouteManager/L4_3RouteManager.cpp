@@ -3,15 +3,15 @@
 #include <iostream>
 #include <map>
 #include <string>
-#include <vector>
+#include <set>
 
 using namespace std;
 
 class RouteManager {
 public:
     void AddRoute(int start, int finish) {
-        reachable_lists_[start].push_back(finish);
-        reachable_lists_[finish].push_back(start);
+        reachable_lists_[start].insert(finish);
+        reachable_lists_[finish].insert(start);
     }
     int FindNearestFinish(int start, int finish) const {
         int result = abs(start - finish);
@@ -52,7 +52,8 @@ int main() {
         cin >> start >> finish;
         if (query_type == "ADD"s) {
             routes.AddRoute(start, finish);
-        } else if (query_type == "GO"s) {
+        }
+        else if (query_type == "GO"s) {
             cout << routes.FindNearestFinish(start, finish) << "\n"s;
         }
     }
