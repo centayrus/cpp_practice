@@ -43,3 +43,4 @@ std::vector<svg::Circle> SetDots(const MapRenderer &renderer);
 // функция для вывода в поток объектов svg
 void MakeSvg(std::ostream &out, const RequestHandler &req_handler, MapRenderer &renderer);
 
+const json::Node RouteToNode(const std::optional<graph::Router<double>::RouteInfo>& route_data, const int req_id);

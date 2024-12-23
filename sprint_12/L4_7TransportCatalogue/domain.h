@@ -58,18 +58,4 @@ struct StopStat {
     std::vector<const Bus *> bus_routes;
 };
 
-struct WaitItem {
-    double time;
-    std::string_view stop_name;
-};
-
-struct MoveItem {
-    double time;
-    std::string_view stop_name;
-};
-
-struct RouteData {
-    double total_time;
-    std::vector<std::variant<WaitItem, MoveItem>> route_items;
-};
 } // namespace domain

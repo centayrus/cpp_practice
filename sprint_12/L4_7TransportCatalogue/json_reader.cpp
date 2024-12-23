@@ -88,15 +88,41 @@ json::Document GetReqsResults(const RequestHandler &req_handler, const std::vect
             tmp_node = json::Builder{}.StartDict().Key("map").Value(nod).Key("request_id").Value(req_id).EndDict().Build();
         } else if (req.AsDict().at("type").AsString() == "Route") {
             // формирование ответа по маршруту
-            req_handler.GetRoute(req.AsDict().at("from").AsString(), req.AsDict().at("to").AsString());
-            
-            tmp_node = json::Builder{}.StartDict().Key("ответ").Value("Фига").EndDict().Build();
-
+            std::string_view from = req.AsDict().at("from").AsString();
+            std::string_view to = req.AsDict().at("to").AsString();
+            auto route_data = req_handler.GetOptimalRoute(from, to);
+            tmp_node = RouteToNode(std::move(route_data), req_id);
         }
         res_array.push_back(tmp_node);
     }
     json::Document result_doc(std::move(res_array));
     return result_doc;
+}
+
+const json::Node RouteToNode(const std::optional<graph::Router<double>::RouteInfo> &route_data, const int req_id) {
+    json::Node result;
+
+    if (!route_data.has_value()) {
+        result = json::Builder{}.StartDict().Key("error_message").Value("not found").Key("request_id").Value(req_id).EndDict().Build();
+    } else {
+        json::Array route_list;
+        route_list.reserve(route_data.value().edges.size());
+        double total_time = 0.;
+        for (const auto &edge : route_data.value().edges) {
+            // const auto edge_map = req_handler.GetRouterGraph().GetEdge(edge);
+            // std::cout << *;
+            auto edge_item = *edge.second;
+            if (edge_item.span == 0) {
+                route_list.emplace_back(json::Node(json::Builder{}.StartDict().Key("stop_name").Value(edge_item.name).Key("time").Value(edge_item.weight).Key("type").Value("Wait").EndDict().Build()));
+                total_time += edge_item.weight;
+            } else {
+                route_list.emplace_back(json::Node(json::Builder{}.StartDict().Key("bus").Value(edge_item.name).Key("span_count").Value(static_cast<int>(edge_item.span)).Key("time").Value(edge_item.weight).Key("type").Value("Bus").EndDict().Build()));
+                total_time += edge_item.weight;
+            }
+        }
+        result = json::Builder{}.StartDict().Key("items").Value(route_list).Key("request_id").Value(req_id).Key("total_time").Value(total_time).EndDict().Build();
+    }
+    return result;
 }
 
 const json::Node BusStatLoad(const domain::BusStat bus_stat, const int req_id) {
@@ -166,7 +192,6 @@ void FillRenderSets(const json::Node &render_node, RenderSets &render_sets) {
     if (!render_sets.validateRenderSets()) {
         throw std::invalid_argument("Render set attrs is not valid");
     }
-
 }
 
 void StopPointsSetter(const RequestHandler &req_handler, MapRenderer &renderer) {
@@ -214,10 +239,8 @@ std::vector<svg::Text> MakeBusNameTextMap(const MapRenderer &renderer) {
 }
 
 std::vector<svg::Text> MakeStopNameTextMap(const MapRenderer &renderer) {
-    // size_t pallet_num = 0;
     std::vector<svg::Text> result;
     renderer.MakeRenderStopName(result /* , pallet_num */);
-    //++pallet_num;
     return result;
 }
 

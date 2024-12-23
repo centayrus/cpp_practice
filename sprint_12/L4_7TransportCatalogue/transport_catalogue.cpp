@@ -102,3 +102,7 @@ void TransportCatalogue::SetDistance(const std::string_view a_name, const std::s
 const std::unordered_map<std::string_view, domain::Bus *> &TransportCatalogue::GetAllRoutes() const {
     return busname_to_bus_;
 }
+
+const std::unordered_map<std::string_view, domain::Stop *>& TransportCatalogue::GetAllStopsList() const {
+    return stopname_to_stop_;
+}

@@ -24,7 +24,7 @@ public:
 
     struct RouteInfo {
         Weight weight;
-        std::vector<EdgeId> edges;
+        std::vector<std::pair<EdgeId, const graph::Edge<Weight>*>> edges;
     };
 
     std::optional<RouteInfo> BuildRoute(VertexId from, VertexId to) const;
@@ -102,14 +102,14 @@ std::optional<typename Router<Weight>::RouteInfo> Router<Weight>::BuildRoute(Ver
         return std::nullopt;
     }
     const Weight weight = route_internal_data->weight;
-    std::vector<EdgeId> edges;
+    std::vector<std::pair<EdgeId, const graph::Edge<Weight>*>> edges;
     for (std::optional<EdgeId> edge_id = route_internal_data->prev_edge;
          edge_id;
          edge_id = routes_internal_data_[from][graph_.GetEdge(*edge_id).from]->prev_edge)
-    {
-        edges.push_back(*edge_id);
+    {   
+        edges.push_back(std::make_pair(*edge_id, &(graph_.GetEdge(*edge_id))));
     }
-    std::reverse(edges.begin(), edges.end());
+    //std::reverse(edges.begin().first, edges.end().first);
 
     return RouteInfo{weight, std::move(edges)};
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include <deque>
 #include <iostream>
+#include <map>
 #include <set>
 #include <string>
 #include <string_view>
@@ -9,8 +10,8 @@
 #include <utility>
 #include <vector>
 
-#include "geo.h"
 #include "domain.h"
+#include "geo.h"
 
 class TransportCatalogue {
 
@@ -27,6 +28,10 @@ public:
 
     const std::unordered_map<std::string_view, domain::Bus *> &GetAllRoutes() const;
 
+    double GetDistance(const domain::Stop *prev_stop, const domain::Stop *cur_stop) const;
+
+    const std::unordered_map<std::string_view, domain::Stop *> &GetAllStopsList() const;
+    
 private:
     std::deque<domain::Stop> stops_list_;
     std::unordered_map<std::string_view, domain::Stop *> stopname_to_stop_;
@@ -34,6 +39,4 @@ private:
     std::unordered_map<std::string_view, domain::Bus *> busname_to_bus_;
     std::unordered_map<std::string_view, std::unordered_set<const domain::Bus *>> stopname_to_bus_;
     std::unordered_map<std::pair<const domain::Stop *, const domain::Stop *>, double, domain::StopDistanceHasher> stop_to_stop_dist_;
-
-    double GetDistance(const domain::Stop *prev_stop, const domain::Stop *cur_stop) const;
 };

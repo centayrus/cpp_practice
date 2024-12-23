@@ -10,6 +10,11 @@ domain::StopStat RequestHandler::GetBusesByStop(const std::string_view &stop_nam
     return db_.ReportStopStatistic(stop_name);
 }
 
+const std::optional<graph::Router<double>::RouteInfo> RequestHandler::GetOptimalRoute(const std::string_view stop_from, const std::string_view stop_to) const {
+    return router_.CreateRoute(stop_from, stop_to);
+}
+
 std::unordered_map<std::string_view, domain::Bus *> RequestHandler::GetAllBusRoutes() const {
     return db_.GetAllRoutes();
 }
+
