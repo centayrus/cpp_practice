@@ -1,5 +1,6 @@
 #include "vector.h"
 
+#include <algorithm>
 #include <iostream>
 #include <stdexcept>
 #include <string>
