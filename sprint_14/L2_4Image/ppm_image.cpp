@@ -13,7 +13,6 @@ static const int PPM_MAX = 255;
 
 // реализуйте эту функцию самостоятельно
 bool SavePPM(const Path &file, const Image &image) {
-
     std::ofstream ofs(file, ios::binary);
     if (!ofs.is_open()) {
         return {};
@@ -31,10 +30,20 @@ bool SavePPM(const Path &file, const Image &image) {
             buff[x * 3 + 2] = static_cast<char>(line[x].b);
         }
         ofs.write(buff.data(), buff.size());
-        
     }
     ofs.close();
     return true;
+}
+
+void NegateInplace(img_lib::Image &image) {
+    for (int y = 0; y < image.GetHeight(); ++y) {
+        Color *line = image.GetLine(y);
+        for (int x = 0; x < image.GetWidth(); ++x) {
+            line[x].r = static_cast<std::byte>(255 - std::to_integer<int>(line[x].r));
+            line[x].g = static_cast<std::byte>(255 - std::to_integer<int>(line[x].g));
+            line[x].b = static_cast<std::byte>(255 - std::to_integer<int>(line[x].b));
+        }
+    }
 }
 
 Image LoadPPM(const Path &file) {

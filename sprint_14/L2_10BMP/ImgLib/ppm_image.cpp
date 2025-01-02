@@ -11,35 +11,31 @@ namespace img_lib {
 static const string_view PPM_SIG = "P6"sv;
 static const int PPM_MAX = 255;
 
-// реализуйте эту функцию самостоятельно
-bool SavePPM(const Path &file, const Image &image) {
+bool SavePPM(const Path& file, const Image& image) {
+    ofstream out(file, ios::binary);
 
-    std::ofstream ofs(file, ios::binary);
-    if (!ofs.is_open()) {
-        return {};
-    }
-    ofs << PPM_SIG << '\n';
-    ofs << image.GetWidth() << ' ' << image.GetHeight() << '\n';
-    ofs << PPM_MAX << '\n';
-    std::vector<char> buff(image.GetWidth() * 3);
-    // обработка строк
-    for (int y = 0; y < image.GetHeight(); ++y) {
-        const Color *line = image.GetLine(y);
-        for (int x = 0; x < image.GetWidth(); ++x) {
+    out << PPM_SIG << '\n' << image.GetWidth() << ' ' << image.GetHeight() << '\n' << PPM_MAX << '\n';
+
+    const int w = image.GetWidth();
+    const int h = image.GetHeight();
+    std::vector<char> buff(w * 3);
+
+    for (int y = 0; y < h; ++y) {
+        const Color* line = image.GetLine(y);
+        for (int x = 0; x < w; ++x) {
             buff[x * 3 + 0] = static_cast<char>(line[x].r);
             buff[x * 3 + 1] = static_cast<char>(line[x].g);
             buff[x * 3 + 2] = static_cast<char>(line[x].b);
         }
-        ofs.write(buff.data(), buff.size());
-        
+        out.write(buff.data(), w * 3);
     }
-    ofs.close();
-    return true;
+
+    return out.good();
 }
 
-Image LoadPPM(const Path &file) {
+Image LoadPPM(const Path& file) {
     // открываем поток с флагом ios::binary
-    // поскольку будем читать даные в двоичном формате
+    // поскольку будем читать данные в двоичном формате
     ifstream ifs(file, ios::binary);
     std::string sign;
     int w, h, color_max;
@@ -55,8 +51,8 @@ Image LoadPPM(const Path &file) {
     }
 
     // пропускаем один байт - это конец строки
-    const int next = ifs.get();
-    if (next == EOF) {
+    const char next = ifs.get();
+    if (next != '\n') {
         return {};
     }
 
@@ -64,7 +60,7 @@ Image LoadPPM(const Path &file) {
     std::vector<char> buff(w * 3);
 
     for (int y = 0; y < h; ++y) {
-        Color *line = result.GetLine(y);
+        Color* line = result.GetLine(y);
         ifs.read(buff.data(), w * 3);
 
         for (int x = 0; x < w; ++x) {
@@ -77,4 +73,4 @@ Image LoadPPM(const Path &file) {
     return result;
 }
 
-} // namespace img_lib
+}  // namespace img_lib
