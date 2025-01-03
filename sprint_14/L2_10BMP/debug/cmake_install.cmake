@@ -1,4 +1,4 @@
-# Install script for directory: /home/atamiev/GitHub/cpp_practice/sprint_14/L2_9LibJPEG_new/ImgConverter
+# Install script for directory: /home/atamiev/GitHub/cpp_practice/sprint_14/L2_10BMP/ImgConverter
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -44,7 +44,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/home/atamiev/GitHub/cpp_practice/sprint_14/L2_9LibJPEG_new/debug/ImgLibBuildDir/cmake_install.cmake")
+  include("/home/atamiev/GitHub/cpp_practice/sprint_14/L2_10BMP/debug/ImgLibBuildDir/cmake_install.cmake")
 
 endif()
 
@@ -56,5 +56,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/atamiev/GitHub/cpp_practice/sprint_14/L2_9LibJPEG_new/debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/atamiev/GitHub/cpp_practice/sprint_14/L2_10BMP/debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

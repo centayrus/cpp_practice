@@ -8,7 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/atamiev/GitHub/cpp_practice/sprint_14/L2_9LibJPEG_new/ImgConverter/main.cpp" "CMakeFiles/imgconv.dir/main.cpp.o" "gcc" "CMakeFiles/imgconv.dir/main.cpp.o.d"
+  "/home/atamiev/GitHub/cpp_practice/sprint_14/L2_10BMP/ImgConverter/main.cpp" "CMakeFiles/imgconv.dir/main.cpp.o" "gcc" "CMakeFiles/imgconv.dir/main.cpp.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

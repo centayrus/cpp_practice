@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/ImgLib.dir/bmp_image.cpp.o"
+  "CMakeFiles/ImgLib.dir/bmp_image.cpp.o.d"
   "CMakeFiles/ImgLib.dir/img_lib.cpp.o"
   "CMakeFiles/ImgLib.dir/img_lib.cpp.o.d"
   "CMakeFiles/ImgLib.dir/jpeg_image.cpp.o"

@@ -1,4 +1,4 @@
-# Install script for directory: /home/atamiev/GitHub/cpp_practice/sprint_14/L2_9LibJPEG_new/ImgLib
+# Install script for directory: /home/atamiev/GitHub/cpp_practice/sprint_14/L2_10BMP/ImgLib
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

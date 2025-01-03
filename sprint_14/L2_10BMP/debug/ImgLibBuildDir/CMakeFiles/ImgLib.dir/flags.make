@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/atamiev/GitHub/cpp_practice/sprint_14/L2_9LibJPEG_new/libjpeg/include
+CXX_INCLUDES = -I/home/atamiev/GitHub/cpp_practice/sprint_14/L2_10BMP/libjpeg/include
 
 CXX_FLAGS = -g -std=gnu++17
 

@@ -7,8 +7,8 @@ set(CMAKE_DEPENDS_GENERATOR "Unix Makefiles")
 # The top level Makefile was generated from the following files:
 set(CMAKE_MAKEFILE_DEPENDS
   "CMakeCache.txt"
-  "/home/atamiev/GitHub/cpp_practice/sprint_14/L2_9LibJPEG_new/ImgConverter/CMakeLists.txt"
-  "/home/atamiev/GitHub/cpp_practice/sprint_14/L2_9LibJPEG_new/ImgLib/CMakeLists.txt"
+  "/home/atamiev/GitHub/cpp_practice/sprint_14/L2_10BMP/ImgConverter/CMakeLists.txt"
+  "/home/atamiev/GitHub/cpp_practice/sprint_14/L2_10BMP/ImgLib/CMakeLists.txt"
   "CMakeFiles/3.28.3/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.28.3/CMakeSystem.cmake"
   "/usr/share/cmake-3.28/Modules/CMakeCXXCompiler.cmake.in"

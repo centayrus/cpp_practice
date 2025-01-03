@@ -8,9 +8,10 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/atamiev/GitHub/cpp_practice/sprint_14/L2_9LibJPEG_new/ImgLib/img_lib.cpp" "ImgLibBuildDir/CMakeFiles/ImgLib.dir/img_lib.cpp.o" "gcc" "ImgLibBuildDir/CMakeFiles/ImgLib.dir/img_lib.cpp.o.d"
-  "/home/atamiev/GitHub/cpp_practice/sprint_14/L2_9LibJPEG_new/ImgLib/jpeg_image.cpp" "ImgLibBuildDir/CMakeFiles/ImgLib.dir/jpeg_image.cpp.o" "gcc" "ImgLibBuildDir/CMakeFiles/ImgLib.dir/jpeg_image.cpp.o.d"
-  "/home/atamiev/GitHub/cpp_practice/sprint_14/L2_9LibJPEG_new/ImgLib/ppm_image.cpp" "ImgLibBuildDir/CMakeFiles/ImgLib.dir/ppm_image.cpp.o" "gcc" "ImgLibBuildDir/CMakeFiles/ImgLib.dir/ppm_image.cpp.o.d"
+  "/home/atamiev/GitHub/cpp_practice/sprint_14/L2_10BMP/ImgLib/bmp_image.cpp" "ImgLibBuildDir/CMakeFiles/ImgLib.dir/bmp_image.cpp.o" "gcc" "ImgLibBuildDir/CMakeFiles/ImgLib.dir/bmp_image.cpp.o.d"
+  "/home/atamiev/GitHub/cpp_practice/sprint_14/L2_10BMP/ImgLib/img_lib.cpp" "ImgLibBuildDir/CMakeFiles/ImgLib.dir/img_lib.cpp.o" "gcc" "ImgLibBuildDir/CMakeFiles/ImgLib.dir/img_lib.cpp.o.d"
+  "/home/atamiev/GitHub/cpp_practice/sprint_14/L2_10BMP/ImgLib/jpeg_image.cpp" "ImgLibBuildDir/CMakeFiles/ImgLib.dir/jpeg_image.cpp.o" "gcc" "ImgLibBuildDir/CMakeFiles/ImgLib.dir/jpeg_image.cpp.o.d"
+  "/home/atamiev/GitHub/cpp_practice/sprint_14/L2_10BMP/ImgLib/ppm_image.cpp" "ImgLibBuildDir/CMakeFiles/ImgLib.dir/ppm_image.cpp.o" "gcc" "ImgLibBuildDir/CMakeFiles/ImgLib.dir/ppm_image.cpp.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.
