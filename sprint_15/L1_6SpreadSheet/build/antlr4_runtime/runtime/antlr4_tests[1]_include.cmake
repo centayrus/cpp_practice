@@ -1,0 +1,5 @@
+if(EXISTS "/home/atamiev/GitHub/cpp_practice/sprint_15/L1_6SpreadSheet/build/antlr4_runtime/runtime/antlr4_tests[1]_tests.cmake")
+  include("/home/atamiev/GitHub/cpp_practice/sprint_15/L1_6SpreadSheet/build/antlr4_runtime/runtime/antlr4_tests[1]_tests.cmake")
+else()
+  add_test(antlr4_tests_NOT_BUILT antlr4_tests_NOT_BUILT)
+endif()

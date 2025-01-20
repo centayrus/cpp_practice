@@ -1,0 +1,14 @@
+# Target labels
+ googletest-populate
+# Source files and their labels
+/home/atamiev/GitHub/cpp_practice/sprint_15/L1_8SpreadSheet/build/_deps/googletest-subbuild/CMakeFiles/googletest-populate
+/home/atamiev/GitHub/cpp_practice/sprint_15/L1_8SpreadSheet/build/_deps/googletest-subbuild/CMakeFiles/googletest-populate.rule
+/home/atamiev/GitHub/cpp_practice/sprint_15/L1_8SpreadSheet/build/_deps/googletest-subbuild/CMakeFiles/googletest-populate-complete.rule
+/home/atamiev/GitHub/cpp_practice/sprint_15/L1_8SpreadSheet/build/_deps/googletest-subbuild/googletest-populate-prefix/src/googletest-populate-stamp/googletest-populate-build.rule
+/home/atamiev/GitHub/cpp_practice/sprint_15/L1_8SpreadSheet/build/_deps/googletest-subbuild/googletest-populate-prefix/src/googletest-populate-stamp/googletest-populate-configure.rule
+/home/atamiev/GitHub/cpp_practice/sprint_15/L1_8SpreadSheet/build/_deps/googletest-subbuild/googletest-populate-prefix/src/googletest-populate-stamp/googletest-populate-download.rule
+/home/atamiev/GitHub/cpp_practice/sprint_15/L1_8SpreadSheet/build/_deps/googletest-subbuild/googletest-populate-prefix/src/googletest-populate-stamp/googletest-populate-install.rule
+/home/atamiev/GitHub/cpp_practice/sprint_15/L1_8SpreadSheet/build/_deps/googletest-subbuild/googletest-populate-prefix/src/googletest-populate-stamp/googletest-populate-mkdir.rule
+/home/atamiev/GitHub/cpp_practice/sprint_15/L1_8SpreadSheet/build/_deps/googletest-subbuild/googletest-populate-prefix/src/googletest-populate-stamp/googletest-populate-patch.rule
+/home/atamiev/GitHub/cpp_practice/sprint_15/L1_8SpreadSheet/build/_deps/googletest-subbuild/googletest-populate-prefix/src/googletest-populate-stamp/googletest-populate-test.rule
+/home/atamiev/GitHub/cpp_practice/sprint_15/L1_8SpreadSheet/build/_deps/googletest-subbuild/googletest-populate-prefix/src/googletest-populate-stamp/googletest-populate-update.rule
