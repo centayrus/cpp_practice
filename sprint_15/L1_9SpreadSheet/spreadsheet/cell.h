@@ -60,7 +60,7 @@ private:
 
 class Cell : public CellInterface {
 public:
-    Cell();
+    Cell() = default;
     ~Cell();
 
     void Set(std::string text);
@@ -75,5 +75,5 @@ private:
     class EmptyImpl;
     class TextImpl;
     class FormulaImpl; */
-    std::unique_ptr<Impl> impl_;
+    std::unique_ptr<Impl> impl_ = nullptr;
 };

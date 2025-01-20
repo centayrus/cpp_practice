@@ -6,8 +6,6 @@
 #include <string>
 
 // Реализуйте следующие методы
-Cell::Cell() : impl_(nullptr) {
-}
 
 Cell::~Cell() {
     impl_.reset();
@@ -18,9 +16,9 @@ void Cell::Set(std::string text) {
         std::string value = "=";
         auto expression = ParseFormula(text.substr(1))->GetExpression();
         value += expression;
-        impl_.reset(std::make_unique<FormulaImpl>(value));
+        impl_ = std::make_unique<FormulaImpl>(value);
     } else {
-        impl_.reset(std::make_unique<TextImpl>(text));
+        impl_ = std::make_unique<TextImpl>(text);
     }
 }
 
