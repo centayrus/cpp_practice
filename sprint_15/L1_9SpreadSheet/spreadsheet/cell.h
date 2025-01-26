@@ -60,7 +60,7 @@ private:
 
 class Cell : public CellInterface {
 public:
-    Cell() = default;
+    Cell();
     ~Cell();
 
     void Set(std::string text);
@@ -70,10 +70,5 @@ public:
     std::string GetText() const override;
 
 private:
-    // можете воспользоваться нашей подсказкой, но это необязательно.
-    /* class Impl;
-    class EmptyImpl;
-    class TextImpl;
-    class FormulaImpl; */
     std::unique_ptr<Impl> impl_ = nullptr;
 };

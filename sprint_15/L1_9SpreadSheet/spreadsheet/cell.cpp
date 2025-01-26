@@ -7,6 +7,8 @@
 
 // Реализуйте следующие методы
 
+Cell::Cell() = default;
+
 Cell::~Cell() {
     impl_.reset();
 }

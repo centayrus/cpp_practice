@@ -39,7 +39,7 @@ public:
     using std::runtime_error::runtime_error;
 };
 
-std::ostream& operator<<(std::ostream& output, FormulaError fe);
+std::ostream &operator<<(std::ostream &output, FormulaError fe);
 
 // Исключение, выбрасываемое при попытке задать синтаксически некорректную
 // формулу
@@ -104,8 +104,8 @@ public:
 
     // Возвращает значение ячейки.
     // Если ячейка пуста, может вернуть nullptr.
-    virtual const CellInterface* GetCell(Position pos) const = 0;
-    virtual CellInterface* GetCell(Position pos) = 0;
+    virtual const CellInterface *GetCell(Position pos) const = 0;
+    virtual CellInterface *GetCell(Position pos) = 0;
 
     // Очищает ячейку.
     // Последующий вызов GetCell() для этой ячейки вернёт либо nullptr, либо
@@ -121,8 +121,8 @@ public:
     // табуляции. После каждой строки выводится символ перевода строки. Для
     // преобразования ячеек в строку используются методы GetValue() или GetText()
     // соответственно. Пустая ячейка представляется пустой строкой в любом случае.
-    virtual void PrintValues(std::ostream& output) const = 0;
-    virtual void PrintTexts(std::ostream& output) const = 0;
+    virtual void PrintValues(std::ostream &output) const = 0;
+    virtual void PrintTexts(std::ostream &output) const = 0;
 };
 
 // Создаёт готовую к работе пустую таблицу.

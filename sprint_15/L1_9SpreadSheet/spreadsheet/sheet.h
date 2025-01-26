@@ -4,18 +4,14 @@
 #include "common.h"
 
 #include <functional>
+#include <memory>
+#include <variant>
 #include <vector>
 
-using CellsSet = std::vector<std::vector<Cell>>;
+using CellsSet = std::vector<std::vector<std::unique_ptr<Cell>>>;
 
 class Sheet : public SheetInterface {
 public:
-    Sheet() : print_size_(),
-    cells_(Position::MAX_ROWS)
-    {
-
-    }
-
     ~Sheet();
 
     void SetCell(Position pos, std::string text) override;
@@ -38,12 +34,21 @@ private:
     Size print_size_;
     std::unique_ptr<SheetInterface> sheet_ = nullptr;
 
-    void PrintableSizeRenew(Position pos) {
-        if (pos.col + 1 > print_size_.cols) {
-            print_size_.cols = pos.col + 1;
-        }
-        if (pos.row + 1 > print_size_.rows) {
-            print_size_.cols = pos.row + 1;
-        }
-    }
+// обновление печатной области после вставки данных в ячейку
+    void PrintableSizeIncrease(Position pos);
+
+// обновление печатной области после очистки данных в ячейке
+    void PrintableSizeDecrease(Position pos);
+
+    // Перегрузки для std::visit
+    template <class... Ts>
+    struct Overloads : Ts... {
+        using Ts::operator()...;
+    };
+    template <class... Ts>
+    Overloads(Ts...) -> Overloads<Ts...>;
+
+    void ConvertVariantOutputData(std::ostream &output, const CellInterface::Value &value) const;
+
+    bool IsDataExist(Position pos) const;
 };

@@ -104,9 +104,9 @@ void TestPrint() {
 
 int main() {
     TestRunner tr;
-    RUN_TEST(tr, TestEmpty);
-    RUN_TEST(tr, TestInvalidPosition);
-    RUN_TEST(tr, TestSetCellPlainText);
+     RUN_TEST(tr, TestEmpty);
+     RUN_TEST(tr, TestInvalidPosition);
+     RUN_TEST(tr, TestSetCellPlainText);
     RUN_TEST(tr, TestClearCell);
     RUN_TEST(tr, TestPrint);
 }

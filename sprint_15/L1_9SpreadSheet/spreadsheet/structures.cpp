@@ -19,7 +19,7 @@ bool Position::operator<(const Position rhs) const {
 }
 
 bool Position::IsValid() const {
-    return row >= 0 && col >= 0 && row < MAX_ROWS && col < MAX_COLS;
+    return row >= 0 && col >= 0 && row < Position::MAX_ROWS && col < Position::MAX_COLS;
 }
 
 std::string Position::ToString() const {
