@@ -2,8 +2,10 @@
 
 #include "common.h"
 #include "formula.h"
+#include "sheet.h"
 
 #include <string>
+#include <memory>
 
 class Impl {
 public:
@@ -58,9 +60,12 @@ private:
     std::string formula_;
 };
 
+class Sheet; 
+
 class Cell : public CellInterface {
 public:
-    Cell();
+
+    Cell(Sheet &sheet);
     ~Cell();
 
     void Set(std::string text);
@@ -71,4 +76,5 @@ public:
 
 private:
     std::unique_ptr<Impl> impl_ = nullptr;
+    Sheet &sheet_;
 };

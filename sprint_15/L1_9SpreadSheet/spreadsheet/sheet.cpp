@@ -1,6 +1,5 @@
 #include "sheet.h"
 
-#include "cell.h"
 #include "common.h"
 
 #include <algorithm>
@@ -22,7 +21,7 @@ void Sheet::SetCell(Position pos, std::string text) {
     if (pos.col >= static_cast<int>(cells_.at(pos.row).size())) {
         cells_.at(pos.row).resize(pos.col + 1);
     }
-    cells_[pos.row][pos.col] = std::make_unique<Cell>();
+    cells_[pos.row][pos.col] = std::make_unique<Cell>(*this);
     cells_[pos.row][pos.col].get()->Set(std::move(text));
     Sheet::PrintableSizeIncrease(pos);
 }

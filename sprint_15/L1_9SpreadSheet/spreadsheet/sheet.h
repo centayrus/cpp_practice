@@ -8,6 +8,8 @@
 #include <variant>
 #include <vector>
 
+class Cell;
+
 using CellsSet = std::vector<std::vector<std::unique_ptr<Cell>>>;
 
 class Sheet : public SheetInterface {
@@ -32,7 +34,7 @@ private:
     // Можете дополнить ваш класс нужными полями и методами
     CellsSet cells_;
     Size print_size_;
-    std::unique_ptr<SheetInterface> sheet_ = nullptr;
+   // std::unique_ptr<SheetInterface> sheet_ = nullptr;
 
 // обновление печатной области после вставки данных в ячейку
     void PrintableSizeIncrease(Position pos);

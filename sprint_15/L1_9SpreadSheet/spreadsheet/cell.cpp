@@ -7,7 +7,7 @@
 
 // Реализуйте следующие методы
 
-Cell::Cell() = default;
+Cell::Cell(Sheet &sheet) : sheet_(sheet), impl_(nullptr) {};
 
 Cell::~Cell() {
     impl_.reset();
