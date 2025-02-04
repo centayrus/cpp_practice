@@ -239,13 +239,19 @@ public:
     }
 
     double Evaluate([[maybe_unused]] const SheetInterface &sheet) const override {
-        if (!cell_->IsValid()) {
-            throw FormulaError(FormulaError::Category::Ref);
+         if (!cell_->IsValid()) {
+             throw FormulaError(FormulaError::Category::Ref);
+         }
+        // std::cout << cell_->row << " " << cell_->col << '\n';
+        // std::cout << sheet.GetCell(*cell_)->GetText() << '\n';
+        auto cell = sheet.GetCell(*cell_);
+        if (!cell) {
+            return 0.;
         }
-        auto result = sheet.GetCell(*cell_)->GetValue();
-        if (!std::holds_alternative<double>(result)) {
-            throw FormulaError(FormulaError::Category::Value);
-        }
+        auto result = cell->GetValue();
+          if (!std::holds_alternative<double>(result)) {
+              throw FormulaError(FormulaError::Category::Value);
+          }
         return std::get<double>(result);
     }
 

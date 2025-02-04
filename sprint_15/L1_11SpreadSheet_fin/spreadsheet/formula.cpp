@@ -27,6 +27,7 @@ public:
     Value Evaluate(const SheetInterface& sheet) const override {
         try {
             return ast_.Execute(sheet);
+            
         } catch (const FormulaError &fe) {
             return fe; // Возвращаем ошибку
         }
@@ -41,8 +42,20 @@ public:
     std::vector<Position> GetReferencedCells() const override {
         std::vector<Position> result;
         // резервируем место, чтобы не было аллокации памяти
-        result.reserve(std::distance(ast_.GetCells().begin(), ast_.GetCells().end()));
-        std::copy(ast_.GetCells().begin(), ast_.GetCells().end(), std::back_inserter(result));
+        //result.reserve(std::distance(ast_.GetCells().begin(), ast_.GetCells().end()));
+        //std::copy(ast_.GetCells().begin(), ast_.GetCells().end(), std::back_inserter(result));
+        
+        auto pos_list = ast_.GetCells();
+        if (pos_list.empty()) {
+            return {};
+        }
+        result.push_back(pos_list.front());
+        for (const auto pos : pos_list) {
+            if (result.back() == pos) {
+                continue;
+            }
+            result.push_back(pos);
+        }
         return result;
     }
 

@@ -51,12 +51,20 @@ Cell::Value Cell::GetValue() const {
         auto eval = ParseFormula(str.substr(1))->Evaluate(sheet_);
         if (std::holds_alternative<double>(eval)) {
             cache_value_ = std::get<double>(eval);
+            std::cout << std::get<double>(eval);
             return std::get<double>(eval);
         }
         cache_value_ = std::get<FormulaError>(eval);
         return std::get<FormulaError>(eval);
     } else if (str[0] == '\'') {
         return str.substr(1);
+    }
+    try {
+        // Попробуем преобразовать строку в double
+        str == "" ? str = "0." : str;
+        return std::stod(str); // Возвращаем double
+    } catch (const std::invalid_argument&) {
+        // Если строка не является допустимым числом, возвращаем строку
     }
     return str;
 }
