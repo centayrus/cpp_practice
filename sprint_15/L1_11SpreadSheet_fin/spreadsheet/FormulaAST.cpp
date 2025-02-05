@@ -144,18 +144,20 @@ public:
     // При делении на 0 выбрасывайте ошибку вычисления FormulaError
     double Evaluate([[maybe_unused]] const SheetInterface &sheet) const override {
         double result;
+        auto lhs_val = lhs_->Evaluate(sheet);
+        auto rhs_val = rhs_->Evaluate(sheet);
         switch (type_) {
         case Add:
-            result = (*lhs_).Evaluate(sheet) + (*rhs_).Evaluate(sheet);
+            result = lhs_val + rhs_val;
             break;
         case Subtract:
-            result = (*lhs_).Evaluate(sheet) - (*rhs_).Evaluate(sheet);
+            result = lhs_val - rhs_val;
             break;
         case Multiply:
-            result = (*lhs_).Evaluate(sheet) * (*rhs_).Evaluate(sheet);
+            result = lhs_val * rhs_val;
             break;
         case Divide:
-            result = (*lhs_).Evaluate(sheet) / (*rhs_).Evaluate(sheet);
+            result = lhs_val / rhs_val;
             break;
         }
         if (!std::isfinite(result)) {
@@ -239,9 +241,9 @@ public:
     }
 
     double Evaluate([[maybe_unused]] const SheetInterface &sheet) const override {
-         if (!cell_->IsValid()) {
-             throw FormulaError(FormulaError::Category::Ref);
-         }
+        if (!cell_->IsValid()) {
+            throw FormulaError(FormulaError::Category::Ref);
+        }
         // std::cout << cell_->row << " " << cell_->col << '\n';
         // std::cout << sheet.GetCell(*cell_)->GetText() << '\n';
         auto cell = sheet.GetCell(*cell_);
@@ -249,10 +251,26 @@ public:
             return 0.;
         }
         auto result = cell->GetValue();
-          if (!std::holds_alternative<double>(result)) {
-              throw FormulaError(FormulaError::Category::Value);
-          }
-        return std::get<double>(result);
+        if (std::holds_alternative<double>(result)) {
+            return std::get<double>(result);
+        }
+        double res = 0.;
+        if (std::holds_alternative<std::string>(result)) {
+            try {
+                size_t pos = 0;
+                std::string str = std::get<std::string>(result);
+                res = std::stod(str, &pos);
+
+                // Проверяем, что вся строка была обработана
+                if (pos != str.size()) {
+                    throw std::invalid_argument("Некорректные символы в строке");
+                }
+                return res;
+            } catch (const std::exception &) {
+                throw FormulaError(FormulaError::Category::Value);
+            }
+        }
+        return res;
     }
 
 private:
@@ -390,27 +408,25 @@ public:
 } // namespace ASTImpl
 
 FormulaAST ParseFormulaAST(std::istream &in) {
-    using namespace antlr4;
-
-    ANTLRInputStream input(in);
-
-    FormulaLexer lexer(&input);
-    ASTImpl::BailErrorListener error_listener;
-    lexer.removeErrorListeners();
-    lexer.addErrorListener(&error_listener);
-
-    CommonTokenStream tokens(&lexer);
-
-    FormulaParser parser(&tokens);
-    auto error_handler = std::make_shared<BailErrorStrategy>();
-    parser.setErrorHandler(error_handler);
-    parser.removeErrorListeners();
-
-    tree::ParseTree *tree = parser.main();
-    ASTImpl::ParseASTListener listener;
-    tree::ParseTreeWalker::DEFAULT.walk(&listener, tree);
-
-    return FormulaAST(listener.MoveRoot(), listener.MoveCells());
+    try {
+        using namespace antlr4;
+        ANTLRInputStream input(in);
+        FormulaLexer lexer(&input);
+        ASTImpl::BailErrorListener error_listener;
+        lexer.removeErrorListeners();
+        lexer.addErrorListener(&error_listener);
+        CommonTokenStream tokens(&lexer);
+        FormulaParser parser(&tokens);
+        auto error_handler = std::make_shared<BailErrorStrategy>();
+        parser.setErrorHandler(error_handler);
+        parser.removeErrorListeners();
+        tree::ParseTree *tree = parser.main();
+        ASTImpl::ParseASTListener listener;
+        tree::ParseTreeWalker::DEFAULT.walk(&listener, tree);
+        return FormulaAST(listener.MoveRoot(), listener.MoveCells());
+    } catch (const std::exception &) {
+        throw FormulaException("");
+    }
 }
 
 FormulaAST ParseFormulaAST(const std::string &in_str) {

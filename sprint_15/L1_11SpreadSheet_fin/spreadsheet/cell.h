@@ -65,7 +65,7 @@ class Sheet;
 
 class Cell : public CellInterface {
 public:
-    Cell(Sheet &sheet, Position pos);
+    explicit Cell(Sheet &sheet, Position pos);
     ~Cell();
 
     void Set(std::string text);
@@ -76,28 +76,29 @@ public:
 
     std::vector<Position> GetReferencedCells() const override;
 
-  //  bool IsReferenced() const;
-
     // дополняет depend_cells_ ячеек, от которой зависит текущая
-  void FillDependCells();
+    void FillDependCells();
 
-void AppendDependCell(Position pos);
+    void AppendDependCell(Position pos);
+
+    // внутренний метод для инвалидации кеша ячеек связанных с текущей
+    // вызывается в Sheet::SetCell для непустой ячейки
+    void CacheInvalidator(/* const std::vector<Position> &ptr_from */);
 
 private:
-    std::unique_ptr<Impl> impl_;
+    std::unique_ptr<Impl> impl_ = nullptr;
     Position cur_pos_;
     mutable std::optional<FormulaInterface::Value> cache_value_; // кеш устанавливается в методе GetValue()
     Sheet &sheet_;
     std::vector<Position> referenced_cells_; // позиции ячеек, на которые ссылается текущая,
                                              // заполняется в методе Set в лексическом анализаторе
-    std::vector<Position> depend_cells_;         // * это ячейки, которые ссылаются на текущую, заполняются в методе GetValue()
+    std::vector<Position> depend_cells_;     // * это ячейки, которые ссылаются на текущую, заполняются в методе GetValue()
                                              // позиции ячеек, чей кеш нужно инвалидировать, т.к. текщая ячейка изменила значение
 
-    
-    // внутренний метод для инвалидации кеша ячеек связанных с текущей
-    // вызывается в методах Clear(), GetValue() -
-    // устанавливает в null поле optional.
-    //void CacheInvalidator(const std::vector<Position> &ptr_from);
+    bool IsValidReferences(const std::vector<Position> ref_pos) const;
 
-    
+    // чистит кеш в конкретной ячейке
+    void EraseCache();
+
+    bool IsReferenced() const;
 };

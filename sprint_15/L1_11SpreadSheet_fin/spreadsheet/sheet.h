@@ -30,16 +30,18 @@ public:
 
     const CellsSet &GetCellsSet() const;
 
+    bool IsDataExist(Position pos) const;
+
 private:
     // Можете дополнить ваш класс нужными полями и методами
     CellsSet cells_;
     Size print_size_;
 
-// обновление печатной области после вставки данных в ячейку
+    // обновление печатной области после вставки данных в ячейку
     void PrintableSizeIncrease(Position pos);
 
-// обновление печатной области после очистки данных в ячейке
-    void PrintableSizeDecrease(Position pos);
+    // обновление печатной области после очистки данных в ячейке
+    void PrintableSizeDecrease(/* Position pos */);
 
     // Перегрузки для std::visit
     template <class... Ts>
@@ -51,5 +53,5 @@ private:
 
     void ConvertVariantOutputData(std::ostream &output, const CellInterface::Value &value) const;
 
-    bool IsDataExist(Position pos) const;
+    void ValidationForException(const Position) const;
 };

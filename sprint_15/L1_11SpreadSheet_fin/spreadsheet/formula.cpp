@@ -27,7 +27,6 @@ public:
     Value Evaluate(const SheetInterface& sheet) const override {
         try {
             return ast_.Execute(sheet);
-            
         } catch (const FormulaError &fe) {
             return fe; // Возвращаем ошибку
         }

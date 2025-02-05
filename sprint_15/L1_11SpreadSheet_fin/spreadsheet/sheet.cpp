@@ -12,8 +12,13 @@ using namespace std::literals;
 Sheet::~Sheet() {}
 
 void Sheet::SetCell(Position pos, std::string text) {
-    if (!pos.IsValid()) {
-        throw InvalidPositionException("");
+    ValidationForException(pos);
+
+    // Сохраняем старое значение ячейки (если оно существует)
+    std::unique_ptr<Cell> old_cell;
+    if (IsDataExist(pos)) {
+        cells_[pos.row][pos.col].get()->CacheInvalidator();
+        old_cell = std::move(cells_[pos.row][pos.col]);
     }
     if (pos.row >= static_cast<int>(cells_.size())) {
         cells_.resize(pos.row + 1);
@@ -21,15 +26,28 @@ void Sheet::SetCell(Position pos, std::string text) {
     if (pos.col >= static_cast<int>(cells_.at(pos.row).size())) {
         cells_.at(pos.row).resize(pos.col + 1);
     }
-    cells_[pos.row][pos.col] = std::make_unique<Cell>(*this, pos);
-    cells_[pos.row][pos.col].get()->Set(std::move(text));
+    // Создаем новую ячейку и помещаем ее в таблицу
+
+    auto new_cell = std::make_unique<Cell>(*this, pos);
+    cells_[pos.row][pos.col] = std::move(new_cell);
+    try {
+        // Пытаемся установить значение в ячейку
+        cells_[pos.row][pos.col]->Set(std::move(text));
+    } catch (const CircularDependencyException &) {
+        // Восстанавливаем старое значение ячейки
+        cells_[pos.row][pos.col] = std::move(old_cell);
+        throw; // Перебрасываем исключение
+    } catch (const FormulaException &) {
+        // Восстанавливаем старое значение ячейки
+        cells_[pos.row][pos.col] = std::move(old_cell);
+        throw; // Перебрасываем исключение
+    }
     Sheet::PrintableSizeIncrease(pos);
 }
 
 const CellInterface *Sheet::GetCell(Position pos) const {
-    if (!pos.IsValid()) {
-        throw InvalidPositionException("");
-    }
+    ValidationForException(pos);
+
     if (Sheet::IsDataExist(pos)) {
         return cells_.at(pos.row).at(pos.col).get();
     }
@@ -47,13 +65,12 @@ CellInterface *Sheet::GetCell(Position pos) {
 }
 
 void Sheet::ClearCell(Position pos) {
-    if (!pos.IsValid()) {
-        throw InvalidPositionException("");
-    }
+    ValidationForException(pos);
+
     if (Sheet::IsDataExist(pos)) {
         cells_[pos.row][pos.col].release();
     }
-    Sheet::PrintableSizeDecrease(pos);
+    Sheet::PrintableSizeDecrease(/* pos */);
 }
 
 Size Sheet::GetPrintableSize() const {
@@ -63,7 +80,7 @@ Size Sheet::GetPrintableSize() const {
 void Sheet::PrintValues(std::ostream &output) const {
     for (int row = 0; row < print_size_.rows; ++row) {
         for (int col = 0; col < print_size_.cols; ++col) {
-            if (Sheet::IsDataExist(Position{row,col})) {
+            if (Sheet::IsDataExist(Position{row, col})) {
                 ConvertVariantOutputData(output, cells_.at(row).at(col).get()->GetValue());
             }
             if (print_size_.cols > col + 1)
@@ -76,7 +93,7 @@ void Sheet::PrintValues(std::ostream &output) const {
 void Sheet::PrintTexts(std::ostream &output) const {
     for (int row = 0; row < print_size_.rows; ++row) {
         for (int col = 0; col < print_size_.cols; ++col) {
-            if (Sheet::IsDataExist(Position{row,col})) {
+            if (Sheet::IsDataExist(Position{row, col})) {
                 output << cells_.at(row).at(col).get()->GetText();
             }
             if (print_size_.cols > col + 1)
@@ -99,7 +116,7 @@ void Sheet::PrintableSizeIncrease(Position pos) {
 }
 
 // обновление печатной области после очистки данных в ячейке
-void Sheet::PrintableSizeDecrease(Position pos) {
+void Sheet::PrintableSizeDecrease(/* Position pos */) {
     int min_y = 0;
     int min_x = 0;
     for (size_t i = 0; i < cells_.size(); ++i) {
@@ -128,8 +145,7 @@ void Sheet::ConvertVariantOutputData(std::ostream &output, const CellInterface::
 }
 
 bool Sheet::IsDataExist(Position pos) const {
-    return pos.row < static_cast<int>(cells_.size()) && pos.col < static_cast<int>(cells_.at(pos.row).size()) 
-    && cells_.at(pos.row).at(pos.col).get() != nullptr;
+    return pos.row < static_cast<int>(cells_.size()) && pos.col < static_cast<int>(cells_.at(pos.row).size()) && cells_.at(pos.row).at(pos.col).get() != nullptr;
 }
 
 std::unique_ptr<SheetInterface> CreateSheet() {
@@ -138,4 +154,10 @@ std::unique_ptr<SheetInterface> CreateSheet() {
 
 const CellsSet &Sheet::GetCellsSet() const {
     return cells_;
+}
+
+void Sheet::ValidationForException(const Position pos) const {
+    if (!pos.IsValid()) {
+        throw InvalidPositionException("");
+    }
 }
